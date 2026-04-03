@@ -1,0 +1,27 @@
+{
+  "model": "claude-opus-4-5",
+  "permissions": {
+    "allow": [
+      "Bash(dart *)",
+      "Bash(flutter *)",
+      "Bash(find *)",
+      "Bash(cat *)",
+      "Bash(mkdir *)",
+      "Bash(touch *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(grep *)",
+      "Write(*)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(dart pub publish)"
+    ]
+  },
+  "env": {
+    "PACKAGE_NAME": "mokr",
+    "PUBLISHER": "MNBLabs",
+    "MIN_FLUTTER_SDK": "3.10.0",
+    "MIN_DART_SDK": "3.0.0"
+  }
+}
