@@ -83,7 +83,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 // Key forces MokrImage to rebuild (new initState) when
                 // the category changes, generating a new URL.
                 child: MokrImage(
-                  key: ValueKey('explore_${i}_${_selected.name}_${providerVersion.value}'),
+                  key: ValueKey(
+                      'explore_${i}_${_selected.name}_${providerVersion.value}'),
                   seed: 'explore_$i',
                   category: _selected,
                   width: double.infinity,

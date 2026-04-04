@@ -88,8 +88,7 @@ class _MokrImageState extends State<MokrImage> {
     // Both width and height may be double.infinity when used inside
     // unconstrained parents (e.g. SliverGrid with childAspectRatio).
     // Fall back to sensible URL dimensions in those cases.
-    final finiteHeight =
-        widget.height.isFinite ? widget.height : 400.0;
+    final finiteHeight = widget.height.isFinite ? widget.height : 400.0;
     final urlWidth = (widget.width != null && widget.width!.isFinite)
         ? widget.width!.round().clamp(1, 8192)
         : (finiteHeight * 2).round().clamp(1, 8192);

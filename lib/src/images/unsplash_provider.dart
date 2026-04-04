@@ -52,7 +52,9 @@ class UnsplashMokrImageProvider extends MokrImageProvider {
           final fetched = await _fetchBatch(apiKey, category, count: 30);
           urls.addAll(fetched);
         } catch (e) {
-          debugPrint('[mokr] Unsplash fetch error (${category.name}): $e');
+          if (kDebugMode) {
+            debugPrint('[mokr] Unsplash fetch error (${category.name}): $e');
+          }
           break;
         }
       }

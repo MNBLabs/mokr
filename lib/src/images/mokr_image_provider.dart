@@ -8,8 +8,8 @@ import '../mokr_enums.dart';
 /// - Be synchronous (return [String], not [Future<String>]).
 ///
 /// Built-in implementations:
-/// - [PicsumMokrImageProvider] — zero-config default.
-/// - [UnsplashMokrImageProvider] — opt-in upgrade (requires API key + pre-warm).
+/// - `PicsumMokrImageProvider` — zero-config default (activated by [Mokr.usePicsum]).
+/// - `UnsplashMokrImageProvider` — opt-in upgrade (activated by [Mokr.useUnsplash]).
 ///
 /// Custom providers can be injected at `Mokr.init(imageProvider: ...)`.
 ///

@@ -185,10 +185,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ? 'Loading 15 categories…'
                               : 'Apply Unsplash Key',
                         ),
-                        onPressed:
-                            _loading || _controller.text.trim().isEmpty
-                                ? null
-                                : _apply,
+                        onPressed: _loading || _controller.text.trim().isEmpty
+                            ? null
+                            : _apply,
                       ),
                     ),
                     if (_usingUnsplash) ...[
@@ -223,12 +222,9 @@ enum _StatusKind { success, error, info }
 
 class _Status {
   const _Status._(this.kind, this.message);
-  const _Status.success(String message)
-      : this._(_StatusKind.success, message);
-  const _Status.error(String message)
-      : this._(_StatusKind.error, message);
-  const _Status.info(String message)
-      : this._(_StatusKind.info, message);
+  const _Status.success(String message) : this._(_StatusKind.success, message);
+  const _Status.error(String message) : this._(_StatusKind.error, message);
+  const _Status.info(String message) : this._(_StatusKind.info, message);
 
   final _StatusKind kind;
   final String message;

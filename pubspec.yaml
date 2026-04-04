@@ -1,18 +1,25 @@
 name: mokr
 description: >-
   Realistic mock data and images for Flutter UI development.
-  Stable users, posts, feeds, and images.
+  Stable users, posts, feeds, and images with deterministic seeding.
   For development and prototyping only.
 version: 0.1.0
 repository: https://github.com/MNBLabs/mokr
 issue_tracker: https://github.com/MNBLabs/mokr/issues
+documentation: https://pub.dev/documentation/mokr/latest/
 topics:
   - mock
   - ui
+  - flutter
   - fake-data
-  - prototyping
   - testing
-
+platforms:
+  android:
+  ios:
+  web:
+  macos:
+  linux:
+  windows:
 environment:
   sdk: '>=3.0.0 <4.0.0'
   flutter: '>=3.10.0'

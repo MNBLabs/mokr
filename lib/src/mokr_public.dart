@@ -76,7 +76,7 @@ final class Mokr {
   /// Mokr.randomUser(slot: 'card_1')
   /// ```
   ///
-  /// **[slot] + [pin: true]** — stable and survives [clearAll]:
+  /// **[slot] + `pin: true`** — stable and survives [clearAll]:
   /// ```dart
   /// Mokr.randomUser(slot: 'hero', pin: true)
   /// ```

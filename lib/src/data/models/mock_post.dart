@@ -8,7 +8,8 @@ import 'mock_user.dart';
 /// All fields are deterministic for a given seed — same seed always
 /// produces the same post across hot reloads, restarts, and reinstalls.
 ///
-/// Obtain via [Mokr.post], [Mokr.randomPost], [Mokr.feedPage], or [asMockPost].
+/// Obtain via [Mokr.post], [Mokr.randomPost], [Mokr.feedPage], or
+/// `'seed'.asMockPost` (see [MokrStringExt]).
 @immutable
 class MockPost {
   const MockPost({

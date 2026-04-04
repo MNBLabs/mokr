@@ -130,7 +130,7 @@ MokrAvatar(seed: 'user_42', size: 48, shape: MokrShape.rounded)
 MokrAvatar(seed: 'user_42', size: 48, shape: MokrShape.square)
 
 // With border
-MokrAvatar(seed: 'user_42', size: 48, borderWidth: 2)
+MokrAvatar(seed: 'user_42', size: 48, border: Border.all(width: 2))
 
 // Custom loading / error states
 MokrAvatar(

@@ -5,7 +5,8 @@ import 'package:flutter/foundation.dart';
 /// All fields are deterministic for a given seed — same seed always
 /// produces the same user across hot reloads, restarts, and reinstalls.
 ///
-/// Obtain via [Mokr.user], [Mokr.randomUser], or the [asMockUser] extension.
+/// Obtain via [Mokr.user], [Mokr.randomUser], or `'seed'.asMockUser`
+/// (see [MokrStringExt]).
 @immutable
 class MockUser {
   const MockUser({

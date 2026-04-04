@@ -62,8 +62,8 @@ class _FeedScreenState extends State<FeedScreen> {
     if (_isLoadingMore) return;
     setState(() => _isLoadingMore = true);
     final nextPage = _currentPage + 1;
-    final more =
-        Mokr.feedPage('home_feed_$_session', page: nextPage, pageSize: _pageSize);
+    final more = Mokr.feedPage('home_feed_$_session',
+        page: nextPage, pageSize: _pageSize);
     setState(() {
       _posts = [..._posts, ...more];
       _currentPage = nextPage;
