@@ -36,3 +36,8 @@ export 'src/data/models/mock_user.dart';
 export 'src/images/mokr_image_provider.dart';
 export 'src/mokr_enums.dart';
 export 'src/mokr_public.dart';
+export 'src/widgets/mokr_avatar.dart';
+export 'src/widgets/mokr_image.dart';
+export 'src/widgets/mokr_post_card.dart';
+export 'src/widgets/mokr_user_tile.dart';
+// MokrShimmer is intentionally NOT exported — internal only.

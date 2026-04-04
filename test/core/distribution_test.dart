@@ -57,7 +57,8 @@ void main() {
         final rng = SeededRng('rd_$i');
         final d = recencyDate(rng, meanDays: 14, maxDays: 365);
         expect(d.isBefore(referenceDate) || d.isAtSameMomentAs(referenceDate),
-            isTrue, reason: 'Date $d is after reference $referenceDate');
+            isTrue,
+            reason: 'Date $d is after reference $referenceDate');
       }
     });
 

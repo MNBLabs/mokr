@@ -29,8 +29,8 @@ void main() {
     });
 
     test('imageUrl respects custom dimensions', () {
-      final url =
-          provider.imageUrl('post_1', MokrCategory.nature, width: 800, height: 600);
+      final url = provider.imageUrl('post_1', MokrCategory.nature,
+          width: 800, height: 600);
       expect(url, contains('800/600'));
     });
 

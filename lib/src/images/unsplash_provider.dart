@@ -1,5 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 import '../core/seed_hash.dart';
 import '../mokr_enums.dart';
@@ -37,22 +39,29 @@ class UnsplashMokrImageProvider extends MokrImageProvider {
   ///
   /// Network failures for individual categories are silently swallowed —
   /// those categories fall back to Picsum at URL lookup time.
-  Future<void> warmUp(String apiKey) async {
+  /// Pre-warms the URL cache.
+  ///
+  /// Returns the number of categories successfully warmed (0–15).
+  /// A return of 0 means the key is invalid or all requests failed.
+  Future<int> warmUp(String apiKey) async {
+    var successCount = 0;
     for (final category in MokrCategory.values) {
       final urls = <String>{};
       for (var batch = 0; batch < 2 && urls.length < 50; batch++) {
         try {
           final fetched = await _fetchBatch(apiKey, category, count: 30);
           urls.addAll(fetched);
-        } catch (_) {
-          // Network failure — continue with whatever we have.
+        } catch (e) {
+          debugPrint('[mokr] Unsplash fetch error (${category.name}): $e');
           break;
         }
       }
       if (urls.isNotEmpty) {
         _cache[category] = urls.take(50).toList();
+        successCount++;
       }
     }
+    return successCount;
   }
 
   Future<List<String>> _fetchBatch(
@@ -67,23 +76,17 @@ class UnsplashMokrImageProvider extends MokrImageProvider {
       'orientation': category == MokrCategory.face ? 'squarish' : 'landscape',
     });
 
-    final client = HttpClient();
-    try {
-      final request = await client.getUrl(uri);
-      request.headers.set(HttpHeaders.acceptHeader, 'application/json');
-      request.headers.set('Accept-Version', 'v1');
-      final response = await request.close();
+    final response = await http.get(uri, headers: {
+      'Accept': 'application/json',
+      'Accept-Version': 'v1',
+    });
 
-      if (response.statusCode != 200) return [];
+    if (response.statusCode != 200) return [];
 
-      final body = await response.transform(utf8.decoder).join();
-      final photos = jsonDecode(body) as List<dynamic>;
-      return photos
-          .map((p) => (p as Map<String, dynamic>)['urls']['regular'] as String)
-          .toList();
-    } finally {
-      client.close();
-    }
+    final photos = jsonDecode(response.body) as List<dynamic>;
+    return photos
+        .map((p) => (p as Map<String, dynamic>)['urls']['regular'] as String)
+        .toList();
   }
 
   @override

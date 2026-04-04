@@ -29,3 +29,9 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 /build/
 /coverage/
+
+# Claude Code context — not for VCS
+.claude/
+
+# Personal notes
+notes.txt

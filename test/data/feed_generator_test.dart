@@ -56,12 +56,10 @@ void main() {
     });
 
     test('no overlap between consecutive pages', () {
-      final page0Seeds = FeedGenerator.page('overlap_feed', 0, 20)
-          .map((p) => p.seed)
-          .toSet();
-      final page1Seeds = FeedGenerator.page('overlap_feed', 1, 20)
-          .map((p) => p.seed)
-          .toSet();
+      final page0Seeds =
+          FeedGenerator.page('overlap_feed', 0, 20).map((p) => p.seed).toSet();
+      final page1Seeds =
+          FeedGenerator.page('overlap_feed', 1, 20).map((p) => p.seed).toSet();
       expect(page0Seeds.intersection(page1Seeds), isEmpty);
     });
   });

@@ -1,0 +1,21 @@
+# Claude Code context and internal planning docs
+.claude/
+
+# Personal notes
+notes.txt
+
+# Internal/generated docs
+docs/
+
+# Coverage output
+coverage/
+
+# Build artefacts
+build/
+
+# IDE files
+*.iml
+.idea/
+
+# Example app (not part of the package)
+example/

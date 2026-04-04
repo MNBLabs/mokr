@@ -124,6 +124,9 @@ class MokrImpl {
   /// Generates a random `mokr_XXXX` seed using non-seeded [Random].
   ///
   /// This is the ONLY place in mokr where non-deterministic randomness is used.
+  /// Exposed for widget seed resolution (MokrImage, etc.).
+  static String generateFreshSeed() => _generateFreshSeed();
+
   static String _generateFreshSeed() {
     const chars =
         'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

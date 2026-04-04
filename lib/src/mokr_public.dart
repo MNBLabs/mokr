@@ -3,7 +3,9 @@ import 'data/generators/feed_generator.dart';
 import 'data/models/mock_post.dart';
 import 'data/models/mock_user.dart';
 import 'images/mokr_image_provider.dart';
+import 'images/picsum_provider.dart';
 import 'images/provider_registry.dart';
+import 'images/unsplash_provider.dart';
 import 'mokr_enums.dart';
 import 'mokr_impl.dart';
 
@@ -246,6 +248,41 @@ final class Mokr {
     assert(MokrImpl.isInitialized,
         'Call await Mokr.init() in main() before using mokr.');
     return SlotRegistry.instance.clearAll();
+  }
+
+  // ─── Image provider switching ─────────────────────────────────────────────
+
+  /// Switches to the Unsplash image provider.
+  ///
+  /// Pre-warms a URL cache (2 API requests per category, 30 total) then
+  /// activates the provider. Does not reinitialise slot state.
+  ///
+  /// Returns the number of categories successfully cached (0–15).
+  /// A return of 0 means the key is invalid or the network is unavailable.
+  ///
+  /// ```dart
+  /// final count = await Mokr.useUnsplash('your_access_key');
+  /// if (count == 0) print('Key may be invalid.');
+  /// ```
+  static Future<int> useUnsplash(String accessKey) async {
+    assert(accessKey.isNotEmpty, 'accessKey cannot be empty.');
+    assert(MokrImpl.isInitialized,
+        'Call await Mokr.init() in main() before using mokr.');
+    final provider = UnsplashMokrImageProvider();
+    final count = await provider.warmUp(accessKey);
+    if (count > 0) setActiveImageProvider(provider);
+    return count;
+  }
+
+  /// Switches back to the default Picsum image provider.
+  ///
+  /// ```dart
+  /// Mokr.usePicsum();
+  /// ```
+  static void usePicsum() {
+    assert(MokrImpl.isInitialized,
+        'Call await Mokr.init() in main() before using mokr.');
+    setActiveImageProvider(const PicsumMokrImageProvider());
   }
 }
 
