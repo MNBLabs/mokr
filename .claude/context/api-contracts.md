@@ -14,15 +14,24 @@ Every method documented as the developer will see it in their IDE.
 /// Asserts in release mode — mokr is for development only.
 ///
 /// ```dart
+/// // Zero config — uses Picsum (no auth required):
 /// void main() async {
 ///   await Mokr.init();
 ///   runApp(MyApp());
 /// }
+///
+/// // With Unsplash API key — real category-filtered images:
+/// void main() async {
+///   await Mokr.init(unsplashKey: 'your_api_key');
+///   runApp(MyApp());
+/// }
 /// ```
 ///
-/// Optional: inject a custom image provider.
-/// Defaults to [UnsplashMokrImageProvider].
-static Future<void> init({MokrImageProvider? imageProvider})
+/// Resolution order: [imageProvider] (explicit) → [unsplashKey] (Unsplash) → Picsum (default).
+static Future<void> init({
+  String? unsplashKey,
+  MokrImageProvider? imageProvider,
+})
 ```
 
 ---
@@ -294,6 +303,10 @@ class MokrAvatar extends StatelessWidget {
   }) : assert(
          seed == null || slot == null,
          'Provide either seed or slot, not both.',
+       ),
+       assert(
+         !pin || slot != null,
+         'pin requires a slot name.',
        );
 
   final String? seed;
@@ -340,7 +353,14 @@ class MokrImage extends StatelessWidget {
     this.borderRadius,
     this.loadingBuilder,
     this.errorBuilder,
-  });
+  }) : assert(
+         seed == null || slot == null,
+         'Provide either seed or slot, not both.',
+       ),
+       assert(
+         !pin || slot != null,
+         'pin requires a slot name.',
+       );
 
   final String? seed;
   final String? slot;
@@ -371,7 +391,14 @@ class MokrPostCard extends StatelessWidget {
     this.slot,
     this.pin = false,
     this.onTap,
-  });
+  }) : assert(
+         seed == null || slot == null,
+         'Provide either seed or slot, not both.',
+       ),
+       assert(
+         !pin || slot != null,
+         'pin requires a slot name.',
+       );
 
   final String? seed;
   final String? slot;
@@ -397,7 +424,14 @@ class MokrUserTile extends StatelessWidget {
     this.pin = false,
     this.trailing,
     this.onTap,
-  });
+  }) : assert(
+         seed == null || slot == null,
+         'Provide either seed or slot, not both.',
+       ),
+       assert(
+         !pin || slot != null,
+         'pin requires a slot name.',
+       );
 
   final String? seed;
   final String? slot;
@@ -432,6 +466,35 @@ enum MokrCategory {
   pets,
 }
 ```
+
+---
+
+## Image Provider Interface
+
+```dart
+/// Abstract interface for image URL construction.
+///
+/// Implement this to use a custom image source.
+/// The interface is sync — all methods return [String], not [Future].
+///
+/// Built-in implementations:
+/// - [PicsumMokrImageProvider] — default, zero-config, category via seed
+/// - [UnsplashMokrImageProvider] — opt-in, requires API key, real categories
+abstract class MokrImageProvider {
+  /// Returns a square avatar image URL.
+  /// [category] is typically [MokrCategory.face] for avatars.
+  String avatarUrl(String seed, MokrCategory category, {int size = 80});
+
+  /// Returns a content image URL.
+  String imageUrl(String seed, MokrCategory category, {int width = 400, int height = 300});
+
+  /// Returns a wide banner image URL.
+  String bannerUrl(String seed, MokrCategory category, {int width = 800, int height = 300});
+}
+```
+
+Note: The public `Mokr.avatarUrl(seed, {size})` method internally passes
+`MokrCategory.face` to the provider. Users don't need to specify category for avatars.
 
 ---
 

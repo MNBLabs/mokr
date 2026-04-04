@@ -1,0 +1,136 @@
+/// 120 bio sentences. Each is a complete sentence suitable for a user bio.
+/// Bios are formed by joining 1–3 of these (with a space separator).
+/// Semver contract: never reorder or remove entries — append only.
+const List<String> kBioPhrases = [
+  // Creative / art
+  'Coffee enthusiast and amateur photographer.',
+  'Finding beauty in everyday moments.',
+  'Turning blank canvases into stories.',
+  'Art is how I breathe.',
+  'Creative director chasing the perfect frame.',
+  'Design is my love language.',
+  'Illustrator with ink-stained fingers.',
+  'Making things look good since forever.',
+  'Colors speak louder than words.',
+  'Sketching the world one page at a time.',
+
+  // Travel / adventure
+  'Exploring the world through a lens.',
+  'Frequent flyer and hostel philosopher.',
+  'Passport stamped, heart full.',
+  'Somewhere between home and everywhere.',
+  'Adventure is just a booking away.',
+  'Maps, mountains, and midnight trains.',
+  'Every city teaches me something new.',
+  'Born to roam, forced to work.',
+  'Lost in the best way possible.',
+  'Chasing sunsets on every continent.',
+
+  // Tech / developer
+  'Building the future one line of code at a time.',
+  'Software engineer by day, tinkerer by night.',
+  'Open-source contributor and coffee drinker.',
+  'Turning caffeine into software.',
+  'Breaking things so others don\'t have to.',
+  'Full-stack developer with strong opinions.',
+  'I write code and occasionally fix it.',
+  'Engineering lead who still loves PRs.',
+  'Automating my way to a shorter to-do list.',
+  'Making computers do interesting things.',
+
+  // Lifestyle / wellness
+  'Traveler, dreamer, and occasional chef.',
+  'Yoga mat on weekdays, trail shoes on weekends.',
+  'Living slowly and loving every minute.',
+  'Mindful mornings, creative afternoons.',
+  'Plant mom, tea drinker, book hoarder.',
+  'Breathing fresh air and fresh ideas.',
+  'Simple pleasures, meaningful days.',
+  'Finding calm in a noisy world.',
+  'Mornings made of sunlight and good coffee.',
+  'Chasing balance, not perfection.',
+
+  // Food
+  'Home cook obsessed with getting it right.',
+  'Food is how I show love.',
+  'Recipe developer and serial taste-tester.',
+  'Everything tastes better made from scratch.',
+  'Fermenting, foraging, and feeding people.',
+  'Kitchen experiments gone deliciously right.',
+  'Meal prepper turned culinary adventurer.',
+  'Pastry nerd with floury hands.',
+  'Ramen on rainy days, tacos on sunny ones.',
+  'Eating my way through every menu.',
+
+  // Fitness / sport
+  'Marathoner in training, always.',
+  'Lifting heavy things for fun.',
+  'Swimmer, cyclist, and reluctant runner.',
+  'The gym is my happy place.',
+  'Competing at the intersection of grit and grace.',
+  'Personal trainer helping people move better.',
+  'Rock climbing keeps my head clear.',
+  'Finishing races one mile at a time.',
+  'Athletic pursuits and recovery playlists.',
+  'Movement is medicine.',
+
+  // Professional
+  'Product manager who ships with empathy.',
+  'UX researcher obsessed with why.',
+  'Marketing strategist and storyteller.',
+  'Data analyst who loves a good chart.',
+  'Startup founder on attempt number three.',
+  'Consultant with a bias toward action.',
+  'Finance professional moonlighting in creativity.',
+  'Architect drafting a better world.',
+  'Teacher who learns something new every day.',
+  'Journalist following the story wherever it goes.',
+
+  // Social / community
+  'Community builder and meeting facilitator.',
+  'Volunteering on weekends, hustling on weekdays.',
+  'Connecting people who should already know each other.',
+  'Nonprofit worker doing work that matters.',
+  'Advocate for the things that deserve advocacy.',
+  'Neighbor, friend, collaborator.',
+  'Making my corner of the internet a nicer place.',
+  'Host of dinners and keeper of guest lists.',
+  'Raising three kids and a sourdough starter.',
+  'Dad joke inventor, amateur philosopher.',
+
+  // Music / entertainment
+  'Musician with a garage full of gear.',
+  'Playlist curator and vinyl collector.',
+  'Singer-songwriter still searching for the hook.',
+  'Film buff who annotates everything.',
+  'Podcast host obsessed with niche topics.',
+  'Writer working on the second draft.',
+  'Comedian on weekends, accountant on Mondays.',
+  'Reading books no one else has heard of.',
+  'Storyteller with too many unfinished drafts.',
+  'Score composer who hums in meetings.',
+
+  // Nature / environment
+  'Nature photographer and conservation volunteer.',
+  'Birdwatcher with a very long life list.',
+  'Ocean swimmer who respects the sea.',
+  'Forager learning what the forest offers.',
+  'Climate scientist turning data into action.',
+  'Gardener growing heirlooms from seed.',
+  'Weekend hiker, weekday dreamer.',
+  'Teaching kids to love the outdoors.',
+  'Camping is my reset button.',
+  'Wilderness guide and occasional poet.',
+
+  // Misc. / personality
+  'Night owl pretending to be a morning person.',
+  'Collector of experiences, not things.',
+  'Overthinker who ships anyway.',
+  'Introvert with excellent taste.',
+  'Chronic learner and question asker.',
+  'Perpetually curious about everything.',
+  'Doing the best I can with what I have.',
+  'Equal parts serious and ridiculous.',
+  'Mostly caffeinated, usually optimistic.',
+  'Human, doing the human thing.',
+];
