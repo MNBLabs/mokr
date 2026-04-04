@@ -7,8 +7,8 @@ Drop one line anywhere in your widget tree. Get a realistic user, post, or image
 ---
 
 > **⚠️ Development and prototyping only.**
-> mokr asserts and refuses to run in release builds.
-> Do not ship it to end users or include it in production app bundles.
+> `mokr` asserts and refuses to run in release builds.
+> **Do not ship** it to end users or include it in production app bundles.
 
 ---
 
@@ -16,7 +16,7 @@ Drop one line anywhere in your widget tree. Get a realistic user, post, or image
 
 Building UI in Flutter means staring at placeholder boxes and `Lorem Ipsum` until your backend is ready. Once you wire up real data, everything shifts — layouts break, names are too long or too short, images never match the category you designed for.
 
-mokr gives you realistic, deterministic mock data that behaves exactly like real data, immediately. A user always has the same name. A post always has the same caption. An image always comes from the right category. Your UI looks finished before your backend exists.
+`mokr` gives you realistic, deterministic mock data that behaves exactly like real data, immediately. A user always has the same name. A post always has the same caption. An image always comes from the right category. Your UI looks finished before your backend exists.
 
 ---
 
@@ -86,7 +86,7 @@ Mokr.randomPost()
 Mokr.randomPost(slot: 'feed_hero', pin: true)
 Mokr.post('post_seed')
 
-MokrAvatar()                              // fresh random
+MokrAvatar()                             // fresh random
 MokrAvatar(slot: 'card_1')               // slot
 MokrAvatar(slot: 'hero', pin: true)      // pinned slot
 MokrAvatar(seed: 'user_42')              // deterministic

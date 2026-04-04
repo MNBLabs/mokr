@@ -27,7 +27,7 @@ class ProfileScreen extends StatelessWidget {
         SliverAppBar(
           expandedHeight: 200,
           pinned: true,
-          title: Text(_user.name),
+          // title: Text(_user.name),
           flexibleSpace: FlexibleSpaceBar(
             background: Stack(
               fit: StackFit.expand,
@@ -35,7 +35,7 @@ class ProfileScreen extends StatelessWidget {
                 // Banner image
                 MokrImage(
                   seed: 'profile_banner',
-                  category: MokrCategory.nature,
+                  category: MokrCategory.interior,
                   width: double.infinity,
                   height: 200,
                 ),

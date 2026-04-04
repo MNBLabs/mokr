@@ -17,5 +17,5 @@ build/
 *.iml
 .idea/
 
-# Example app (not part of the package)
-example/
+# Example test directory (redundant for pub.dev)
+example/test/
