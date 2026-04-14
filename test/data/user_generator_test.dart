@@ -1,14 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mokr/src/data/generators/user_generator.dart';
-import 'package:mokr/src/images/picsum_provider.dart';
-import 'package:mokr/src/images/provider_registry.dart';
-import 'package:mokr/src/mokr_enums.dart';
 
 void main() {
-  setUpAll(() {
-    setActiveImageProvider(const PicsumMokrImageProvider());
-  });
-
   group('UserGenerator', () {
     test('same seed always produces same user', () {
       const seed = 'user_42';
@@ -16,10 +9,11 @@ void main() {
       final b = UserGenerator.generate(seed);
       expect(a.seed, equals(b.seed));
       expect(a.id, equals(b.id));
+      expect(a.firstName, equals(b.firstName));
+      expect(a.lastName, equals(b.lastName));
       expect(a.name, equals(b.name));
       expect(a.username, equals(b.username));
       expect(a.bio, equals(b.bio));
-      expect(a.avatarUrl, equals(b.avatarUrl));
       expect(a.followerCount, equals(b.followerCount));
       expect(a.followingCount, equals(b.followingCount));
       expect(a.postCount, equals(b.postCount));
@@ -27,7 +21,7 @@ void main() {
       expect(a.joinedAt, equals(b.joinedAt));
     });
 
-    test('same seed 10000 calls all return same name', () {
+    test('same seed 100 calls all return same name', () {
       const seed = 'stability_check';
       final first = UserGenerator.generate(seed).name;
       for (var i = 0; i < 100; i++) {
@@ -47,13 +41,24 @@ void main() {
       expect(user.id.length, equals(8)); // 'usr_' + 4 hex chars
     });
 
-    test('username is @-prefixed lowercase', () {
+    test('username is lowercase with no @ prefix', () {
       final user = UserGenerator.generate('test_user');
-      expect(user.username, startsWith('@'));
+      expect(user.username, isNot(startsWith('@')));
       expect(user.username, equals(user.username.toLowerCase()));
     });
 
-    test('followerCount is non-negative', () {
+    test('handle is @-prefixed username', () {
+      final user = UserGenerator.generate('test_user');
+      expect(user.handle, startsWith('@'));
+      expect(user.handle, equals('@${user.username}'));
+    });
+
+    test('name combines firstName and lastName', () {
+      final user = UserGenerator.generate('test_user');
+      expect(user.name, equals('${user.firstName} ${user.lastName}'));
+    });
+
+    test('followerCount is non-negative and within bound', () {
       for (var i = 0; i < 50; i++) {
         final user = UserGenerator.generate('follower_$i');
         expect(user.followerCount, isNonNegative);
@@ -97,21 +102,13 @@ void main() {
       }
     });
 
-    test('avatarUrl uses face category and Picsum format', () {
-      final user = UserGenerator.generate('avatar_test');
-      expect(user.avatarUrl, contains('picsum.photos'));
-      expect(user.avatarUrl, contains(MokrCategory.face.keyword));
-    });
-
-    test('initials computed correctly', () {
-      // Find a user with a multi-word name
-      for (var i = 0; i < 100; i++) {
+    test('initials are two uppercase letters', () {
+      for (var i = 0; i < 50; i++) {
         final user = UserGenerator.generate('initials_$i');
-        final parts = user.name.split(' ');
-        final expected = parts.length == 1
-            ? parts[0][0].toUpperCase()
-            : '${parts[0][0]}${parts.last[0]}'.toUpperCase();
-        expect(user.initials, equals(expected));
+        expect(user.initials.length, equals(2));
+        expect(user.initials, equals(user.initials.toUpperCase()));
+        expect(user.initials[0], equals(user.firstName[0].toUpperCase()));
+        expect(user.initials[1], equals(user.lastName[0].toUpperCase()));
       }
     });
 
@@ -119,6 +116,16 @@ void main() {
       final a = UserGenerator.generate('eq_seed');
       final b = UserGenerator.generate('eq_seed');
       expect(a, equals(b));
+    });
+
+    test('formattedFollowers is non-empty', () {
+      final user = UserGenerator.generate('fmt_test');
+      expect(user.formattedFollowers, isNotEmpty);
+    });
+
+    test('relativeJoinDate starts with Joined', () {
+      final user = UserGenerator.generate('join_date_test');
+      expect(user.relativeJoinDate, startsWith('Joined '));
     });
   });
 }

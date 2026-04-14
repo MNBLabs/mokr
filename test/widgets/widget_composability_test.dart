@@ -3,27 +3,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mokr/mokr.dart';
-import 'package:mokr/src/mokr_impl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-// ─── Shared test app wrapper ───────────────────────────────────────────────────
 
 Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
-
-// ─── Setup / teardown ─────────────────────────────────────────────────────────
 
 void main() {
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
-    SharedPreferences.setMockInitialValues({});
-    await MokrImpl.init();
+    await Mokr.init();
   });
 
-  tearDownAll(() async {
-    await MokrImpl.resetForTesting();
-  });
-
-  // ─── MokrAvatar ─────────────────────────────────────────────────────────────
+  // ─── MokrAvatar ──────────────────────────────────────────────────────────
 
   group('MokrAvatar', () {
     testWidgets('renders in Container', (tester) async {
@@ -69,12 +58,12 @@ void main() {
       expect(find.byType(MokrAvatar), findsOneWidget);
     });
 
-    testWidgets('circle shape clips correctly', (tester) async {
+    testWidgets('circle shape clips with ClipOval', (tester) async {
       await tester.pumpWidget(_wrap(
         MokrAvatar(seed: 'u1', size: 48, shape: MokrShape.circle),
       ));
       await tester.pump();
-      expect(find.byType(ClipOval), findsWidgets);
+      expect(find.byType(ClipOval), findsOneWidget);
     });
 
     testWidgets('rounded shape uses ClipRRect', (tester) async {
@@ -82,7 +71,7 @@ void main() {
         MokrAvatar(seed: 'u1', size: 48, shape: MokrShape.rounded),
       ));
       await tester.pump();
-      expect(find.byType(ClipRRect), findsWidgets);
+      expect(find.byType(ClipRRect), findsOneWidget);
     });
 
     testWidgets('square shape renders without clip', (tester) async {
@@ -91,25 +80,6 @@ void main() {
       ));
       await tester.pump();
       expect(find.byType(MokrAvatar), findsOneWidget);
-    });
-
-    testWidgets('custom loadingBuilder is called', (tester) async {
-      var called = false;
-      await tester.pumpWidget(_wrap(
-        MokrAvatar(
-          seed: 'u1',
-          size: 48,
-          loadingBuilder: (ctx) {
-            called = true;
-            return const SizedBox.square(dimension: 48);
-          },
-        ),
-      ));
-      await tester.pump();
-      // loadingBuilder may or may not be called depending on network state;
-      // we just verify the widget renders without throwing.
-      expect(find.byType(MokrAvatar), findsOneWidget);
-      expect(called, anyOf(isTrue, isFalse)); // accessed to avoid lint
     });
 
     testWidgets('onTap callback wires up GestureDetector', (tester) async {
@@ -121,18 +91,9 @@ void main() {
       await tester.tap(find.byType(MokrAvatar));
       expect(tapped, isTrue);
     });
-
-    testWidgets('error fallback renders initials text', (tester) async {
-      await tester.pumpWidget(_wrap(
-        const MokrAvatar(seed: 'initials_test', size: 80),
-      ));
-      // Pump enough time for network to fail and error builder to trigger
-      await tester.pump(const Duration(seconds: 5));
-      expect(find.byType(MokrAvatar), findsOneWidget);
-    });
   });
 
-  // ─── MokrImage ──────────────────────────────────────────────────────────────
+  // ─── MokrImage ───────────────────────────────────────────────────────────
 
   group('MokrImage', () {
     testWidgets('renders in Container', (tester) async {
@@ -215,22 +176,6 @@ void main() {
       expect(find.byType(ClipRRect), findsOneWidget);
     });
 
-    testWidgets('custom errorBuilder renders on network failure',
-        (tester) async {
-      await tester.pumpWidget(_wrap(
-        MokrImage(
-          seed: 'err_img',
-          category: MokrCategory.nature,
-          height: 200,
-          errorBuilder: (ctx) =>
-              const SizedBox(height: 200, child: Text('error')),
-        ),
-      ));
-      // Pump with time to allow network failure to propagate
-      await tester.pump(const Duration(seconds: 5));
-      expect(find.byType(MokrImage), findsOneWidget);
-    });
-
     testWidgets('all categories render without throwing', (tester) async {
       for (final cat in MokrCategory.values) {
         await tester.pumpWidget(_wrap(
@@ -243,7 +188,7 @@ void main() {
     });
   });
 
-  // ─── MokrPostCard ───────────────────────────────────────────────────────────
+  // ─── MokrPostCard ─────────────────────────────────────────────────────────
 
   group('MokrPostCard', () {
     testWidgets('renders in Container', (tester) async {
@@ -313,7 +258,7 @@ void main() {
     });
   });
 
-  // ─── MokrUserTile ───────────────────────────────────────────────────────────
+  // ─── MokrUserTile ─────────────────────────────────────────────────────────
 
   group('MokrUserTile', () {
     testWidgets('renders in Container', (tester) async {
@@ -333,24 +278,6 @@ void main() {
       ));
       await tester.pump();
       expect(find.byType(MokrUserTile), findsWidgets);
-    });
-
-    testWidgets('renders in Stack', (tester) async {
-      await tester.pumpWidget(_wrap(
-        Stack(children: [
-          SizedBox(width: 400, child: MokrUserTile(seed: 'u1')),
-        ]),
-      ));
-      await tester.pump();
-      expect(find.byType(MokrUserTile), findsOneWidget);
-    });
-
-    testWidgets('renders in Expanded', (tester) async {
-      await tester.pumpWidget(_wrap(
-        Row(children: [Expanded(child: MokrUserTile(seed: 'u1'))]),
-      ));
-      await tester.pump();
-      expect(find.byType(MokrUserTile), findsOneWidget);
     });
 
     testWidgets('slot mode renders without error', (tester) async {

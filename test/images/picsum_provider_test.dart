@@ -1,15 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mokr/src/images/mokr_image_provider.dart';
 import 'package:mokr/src/images/picsum_provider.dart';
-import 'package:mokr/src/mokr_enums.dart';
 
 void main() {
   const provider = PicsumMokrImageProvider();
 
   group('PicsumMokrImageProvider', () {
-    test('avatarUrl returns valid HTTPS Picsum URL', () {
+    test('avatarUrl returns valid HTTPS Picsum URL with default size', () {
       final url = provider.avatarUrl('user_42', MokrCategory.face);
       expect(url, startsWith('https://picsum.photos/seed/'));
-      expect(url, contains('80/80')); // default size
+      expect(url, contains('80/80'));
     });
 
     test('avatarUrl respects custom size', () {
@@ -17,33 +17,33 @@ void main() {
       expect(url, contains('120/120'));
     });
 
-    test('avatarUrl encodes category in seed', () {
+    test('avatarUrl encodes category keyword in seed', () {
       final url = provider.avatarUrl('user_42', MokrCategory.face);
       expect(url, contains(MokrCategory.face.keyword));
     });
 
-    test('imageUrl returns valid HTTPS Picsum URL', () {
+    test('imageUrl returns valid HTTPS Picsum URL with v1 defaults', () {
       final url = provider.imageUrl('post_1', MokrCategory.nature);
       expect(url, startsWith('https://picsum.photos/seed/'));
-      expect(url, contains('400/300')); // defaults
+      expect(url, contains('800/600')); // v1 defaults
     });
 
     test('imageUrl respects custom dimensions', () {
       final url = provider.imageUrl('post_1', MokrCategory.nature,
-          width: 800, height: 600);
-      expect(url, contains('800/600'));
+          width: 400, height: 300);
+      expect(url, contains('400/300'));
     });
 
-    test('bannerUrl returns valid HTTPS Picsum URL', () {
+    test('bannerUrl returns valid HTTPS Picsum URL with v1 defaults', () {
       final url = provider.bannerUrl('profile_42', MokrCategory.nature);
       expect(url, startsWith('https://picsum.photos/seed/'));
-      expect(url, contains('800/300')); // defaults
+      expect(url, contains('1200/400')); // v1 defaults
     });
 
     test('bannerUrl respects custom dimensions', () {
       final url = provider.bannerUrl('profile_42', MokrCategory.nature,
-          width: 1200, height: 400);
-      expect(url, contains('1200/400'));
+          width: 800, height: 300);
+      expect(url, contains('800/300'));
     });
 
     test('different seeds produce different URLs', () {
@@ -77,6 +77,12 @@ void main() {
         expect(url, startsWith('https://picsum.photos/seed/'),
             reason: 'Failed for category ${cat.name}');
       }
+    });
+
+    test('knownAspectRatio returns positive value', () {
+      final ratio = provider.knownAspectRatio('seed', MokrCategory.nature);
+      expect(ratio, isNotNull);
+      expect(ratio!, greaterThan(0));
     });
   });
 }

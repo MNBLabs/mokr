@@ -3,7 +3,7 @@ description: >-
   Realistic mock data and images for Flutter UI development.
   Stable users, posts, feeds, and images with deterministic seeding.
   For development and prototyping only.
-version: 0.1.0
+version: 0.2.0-dev
 repository: https://github.com/MNBLabs/mokr
 issue_tracker: https://github.com/MNBLabs/mokr/issues
 documentation: https://pub.dev/documentation/mokr/latest/
@@ -26,8 +26,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  shared_preferences: ^2.2.0
-  http: ^1.0.0
+  path_provider: ^2.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

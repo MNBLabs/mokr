@@ -1,13 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mokr/src/data/generators/feed_generator.dart';
-import 'package:mokr/src/images/picsum_provider.dart';
-import 'package:mokr/src/images/provider_registry.dart';
 
 void main() {
-  setUpAll(() {
-    setActiveImageProvider(const PicsumMokrImageProvider());
-  });
-
   group('FeedGenerator', () {
     test('same seed + page always returns same posts', () {
       final a = FeedGenerator.page('home_feed', 0, 20);

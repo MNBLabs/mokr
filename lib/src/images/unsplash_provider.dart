@@ -1,45 +1,33 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
 import '../core/seed_hash.dart';
-import '../mokr_enums.dart';
 import 'mokr_image_provider.dart';
 import 'picsum_provider.dart';
 
 /// Opt-in image provider backed by the Unsplash API.
 ///
-/// Requires a free Unsplash API key. Activated via:
+/// Requires a free Unsplash access key. Activate via:
 /// ```dart
-/// await Mokr.init(unsplashKey: 'your_api_key');
+/// await Mokr.init(unsplashKey: 'your_access_key');
 /// ```
 ///
-/// **Pre-warming:** On [warmUp], this provider fetches ~50 CDN image URLs per
-/// [MokrCategory] from the Unsplash API (30 HTTP requests at init time).
-/// After [warmUp] completes, all URL construction is synchronous.
+/// On pre-warm, fetches ~50 CDN URLs per [MokrCategory] using `dart:io`
+/// [HttpClient]. After warm-up, all URL lookups are synchronous.
 ///
-/// **Cache miss:** If a category has no warmed URLs (e.g. network error during
-/// pre-warm), the call falls back to [PicsumMokrImageProvider] transparently.
+/// Falls back to [PicsumMokrImageProvider] for any category with no cached URLs.
 ///
-/// Images are sourced from Unsplash (https://unsplash.com).
-/// For development and prototyping only.
-/// Do not use in production apps or ship to end users.
+/// For development and prototyping only — do not ship to end users.
 class UnsplashMokrImageProvider extends MokrImageProvider {
   UnsplashMokrImageProvider();
 
-  final Map<MokrCategory, List<String>> _cache = {};
+  final Map<MokrCategory, List<String>> _urlCache = {};
+  final Map<MokrCategory, double?> _ratioCache = {};
   final _picsum = const PicsumMokrImageProvider();
 
-  /// Pre-warms the cache by fetching CDN URLs from the Unsplash API.
-  ///
-  /// Makes 2 batch requests per category (15 categories × 2 = 30 requests).
-  /// Each request fetches up to 30 random photos. Deduplicates and stores
-  /// up to 50 URLs per category in memory.
-  ///
-  /// Network failures for individual categories are silently swallowed —
-  /// those categories fall back to Picsum at URL lookup time.
-  /// Pre-warms the URL cache.
+  /// Pre-warms the URL cache by fetching CDN URLs from the Unsplash API.
   ///
   /// Returns the number of categories successfully warmed (0–15).
   /// A return of 0 means the key is invalid or all requests failed.
@@ -47,26 +35,33 @@ class UnsplashMokrImageProvider extends MokrImageProvider {
     var successCount = 0;
     for (final category in MokrCategory.values) {
       final urls = <String>{};
+      final ratios = <double>[];
       for (var batch = 0; batch < 2 && urls.length < 50; batch++) {
         try {
-          final fetched = await _fetchBatch(apiKey, category, count: 30);
-          urls.addAll(fetched);
+          final result = await _fetchBatch(apiKey, category, count: 30);
+          for (final item in result) {
+            urls.add(item.url);
+            if (item.ratio != null) ratios.add(item.ratio!);
+          }
         } catch (e) {
           if (kDebugMode) {
-            debugPrint('[mokr] Unsplash fetch error (${category.name}): $e');
+            debugPrint('[mokr] ⚠️  unsplash failed: ${category.keyword} — $e');
           }
           break;
         }
       }
       if (urls.isNotEmpty) {
-        _cache[category] = urls.take(50).toList();
+        _urlCache[category] = urls.take(50).toList();
+        if (ratios.isNotEmpty) {
+          _ratioCache[category] = ratios.reduce((a, b) => a + b) / ratios.length;
+        }
         successCount++;
       }
     }
     return successCount;
   }
 
-  Future<List<String>> _fetchBatch(
+  Future<List<_UnsplashPhoto>> _fetchBatch(
     String apiKey,
     MokrCategory category, {
     required int count,
@@ -78,23 +73,33 @@ class UnsplashMokrImageProvider extends MokrImageProvider {
       'orientation': category == MokrCategory.face ? 'squarish' : 'landscape',
     });
 
-    final response = await http.get(uri, headers: {
-      'Accept': 'application/json',
-      'Accept-Version': 'v1',
-    });
-
-    if (response.statusCode != 200) return [];
-
-    final photos = jsonDecode(response.body) as List<dynamic>;
-    return photos
-        .map((p) => (p as Map<String, dynamic>)['urls']['regular'] as String)
-        .toList();
+    final client = HttpClient();
+    try {
+      final request = await client.getUrl(uri);
+      request.headers
+        ..set('Accept', 'application/json')
+        ..set('Accept-Version', 'v1');
+      final response = await request.close();
+      if (response.statusCode != 200) return [];
+      final body = await response.transform(const Utf8Decoder()).join();
+      final photos = jsonDecode(body) as List<dynamic>;
+      return photos.map((p) {
+        final map = p as Map<String, dynamic>;
+        final url = map['urls']['regular'] as String;
+        final w = (map['width'] as num?)?.toDouble();
+        final h = (map['height'] as num?)?.toDouble();
+        final ratio = (w != null && h != null && h > 0) ? w / h : null;
+        return _UnsplashPhoto(url: url, ratio: ratio);
+      }).toList();
+    } finally {
+      client.close();
+    }
   }
 
   @override
   String avatarUrl(String seed, MokrCategory category, {int size = 80}) {
-    assert(size > 0, 'size must be positive');
-    final urls = _cache[MokrCategory.face];
+    assert(size > 0);
+    final urls = _urlCache[MokrCategory.face];
     if (urls == null || urls.isEmpty) {
       return _picsum.avatarUrl(seed, category, size: size);
     }
@@ -105,12 +110,12 @@ class UnsplashMokrImageProvider extends MokrImageProvider {
   String imageUrl(
     String seed,
     MokrCategory category, {
-    int width = 400,
-    int height = 300,
+    int width = 800,
+    int height = 600,
   }) {
-    assert(width > 0, 'width must be positive');
-    assert(height > 0, 'height must be positive');
-    final urls = _cache[category];
+    assert(width > 0);
+    assert(height > 0);
+    final urls = _urlCache[category];
     if (urls == null || urls.isEmpty) {
       return _picsum.imageUrl(seed, category, width: width, height: height);
     }
@@ -121,15 +126,26 @@ class UnsplashMokrImageProvider extends MokrImageProvider {
   String bannerUrl(
     String seed,
     MokrCategory category, {
-    int width = 800,
-    int height = 300,
+    int width = 1200,
+    int height = 400,
   }) {
-    assert(width > 0, 'width must be positive');
-    assert(height > 0, 'height must be positive');
-    final urls = _cache[category];
+    assert(width > 0);
+    assert(height > 0);
+    final urls = _urlCache[category];
     if (urls == null || urls.isEmpty) {
       return _picsum.bannerUrl(seed, category, width: width, height: height);
     }
     return urls[SeedHash.hash(seed) % urls.length];
   }
+
+  @override
+  double? knownAspectRatio(String seed, MokrCategory category) {
+    return _ratioCache[category];
+  }
+}
+
+class _UnsplashPhoto {
+  const _UnsplashPhoto({required this.url, this.ratio});
+  final String url;
+  final double? ratio;
 }

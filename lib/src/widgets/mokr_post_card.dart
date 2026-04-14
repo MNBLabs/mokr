@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../core/mokr_base.dart';
 import '../data/models/mock_post.dart';
-import '../mokr_public.dart';
 import 'mokr_avatar.dart';
 import 'mokr_image.dart';
 
@@ -9,7 +9,7 @@ import 'mokr_image.dart';
 ///
 /// ```dart
 /// MokrPostCard(seed: 'post_0')
-/// MokrPostCard(slot: 'feed_hero', pin: true)
+/// MokrPostCard(slot: 'feed_hero')
 /// MokrPostCard(seed: 'feed_$i')  // inside ListView.builder
 /// ```
 class MokrPostCard extends StatelessWidget {
@@ -17,33 +17,21 @@ class MokrPostCard extends StatelessWidget {
     super.key,
     this.seed,
     this.slot,
-    this.pin = false,
     this.onTap,
-  })  : assert(
+  }) : assert(
           seed == null || slot == null,
           'Provide either seed or slot, not both.',
-        ),
-        assert(
-          !pin || slot != null,
-          'pin requires a slot name.',
         );
 
-  /// Deterministic seed. Provide [seed] or [slot], not both.
   final String? seed;
-
-  /// Slot name for stable-random mode. Persisted across restarts.
   final String? slot;
-
-  /// When true, this slot survives [Mokr.clearAll]. Requires [slot].
-  final bool pin;
-
-  /// Called when the card is tapped.
   final VoidCallback? onTap;
 
   MockPost _resolvePost() {
+    // Phase 2 will wire Mokr.random.post(slot:) here.
     if (seed != null) return Mokr.post(seed!);
-    if (slot != null) return Mokr.randomPost(slot: slot!, pin: pin);
-    return Mokr.randomPost();
+    if (slot != null) return Mokr.post(slot!);
+    return Mokr.post('default');
   }
 
   @override
@@ -61,7 +49,7 @@ class MokrPostCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ── Author row ────────────────────────────────────────────────
+            // Author row
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
               child: Row(
@@ -76,9 +64,8 @@ class MokrPostCard extends StatelessWidget {
                           children: [
                             Text(
                               post.author.name,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: theme.textTheme.bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.w600),
                             ),
                             if (post.author.isVerified) ...[
                               const SizedBox(width: 4),
@@ -91,7 +78,7 @@ class MokrPostCard extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          post.author.username,
+                          post.author.handle,
                           style: theme.textTheme.bodySmall
                               ?.copyWith(color: mutedColor),
                         ),
@@ -106,17 +93,15 @@ class MokrPostCard extends StatelessWidget {
                 ],
               ),
             ),
-
-            // ── Post image ────────────────────────────────────────────────
+            // Post image
             if (post.hasImage)
               MokrImage(
                 seed: post.seed,
-                category: post.imageCategory!,
+                category: post.category,
                 width: double.infinity,
                 height: 200,
               ),
-
-            // ── Caption ───────────────────────────────────────────────────
+            // Caption
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
               child: Text(
@@ -126,8 +111,7 @@ class MokrPostCard extends StatelessWidget {
                 style: theme.textTheme.bodyMedium,
               ),
             ),
-
-            // ── Action row ────────────────────────────────────────────────
+            // Action row
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 2, 12, 12),
               child: Row(

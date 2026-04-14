@@ -1,13 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mokr/src/data/generators/post_generator.dart';
-import 'package:mokr/src/images/picsum_provider.dart';
-import 'package:mokr/src/images/provider_registry.dart';
 
 void main() {
-  setUpAll(() {
-    setActiveImageProvider(const PicsumMokrImageProvider());
-  });
-
   group('PostGenerator', () {
     test('same seed always produces same post', () {
       const seed = 'post_42';
@@ -16,7 +10,8 @@ void main() {
       expect(a.seed, equals(b.seed));
       expect(a.id, equals(b.id));
       expect(a.caption, equals(b.caption));
-      expect(a.imageUrl, equals(b.imageUrl));
+      expect(a.hasImage, equals(b.hasImage));
+      expect(a.category, equals(b.category));
       expect(a.likeCount, equals(b.likeCount));
       expect(a.commentCount, equals(b.commentCount));
       expect(a.shareCount, equals(b.shareCount));
@@ -29,7 +24,6 @@ void main() {
     test('different seeds produce different posts', () {
       final a = PostGenerator.generate('post_aaa');
       final b = PostGenerator.generate('post_bbb');
-      // At least one field should differ
       final different = a.caption != b.caption ||
           a.likeCount != b.likeCount ||
           a.commentCount != b.commentCount;
@@ -80,31 +74,20 @@ void main() {
       }
     });
 
-    test('imageUrl is non-null when hasImage is true', () {
-      var hasImageCount = 0;
-      for (var i = 0; i < 50; i++) {
-        final post = PostGenerator.generate('img_$i');
-        if (post.hasImage) {
-          expect(post.imageUrl, isNotNull);
-          expect(post.imageUrl, isNotEmpty);
-          hasImageCount++;
-        } else {
-          expect(post.imageUrl, isNull);
-        }
-      }
-      // ~80% should have images; at least some should
-      expect(hasImageCount, greaterThan(20));
-    });
-
-    test('imageCategory is null when hasImage is false', () {
+    test('category is always set', () {
       for (var i = 0; i < 50; i++) {
         final post = PostGenerator.generate('cat_$i');
-        if (!post.hasImage) {
-          expect(post.imageCategory, isNull);
-        } else {
-          expect(post.imageCategory, isNotNull);
-        }
+        // category is non-nullable in v1 — always set regardless of hasImage
+        expect(post.category, isNotNull);
       }
+    });
+
+    test('roughly 80% of posts have images', () {
+      var hasImageCount = 0;
+      for (var i = 0; i < 50; i++) {
+        if (PostGenerator.generate('img_$i').hasImage) hasImageCount++;
+      }
+      expect(hasImageCount, greaterThan(20));
     });
 
     test('createdAt is at or before reference date', () {

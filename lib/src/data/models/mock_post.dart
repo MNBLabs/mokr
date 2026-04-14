@@ -1,15 +1,14 @@
 import 'package:flutter/foundation.dart';
 
-import '../../mokr_enums.dart';
+import '../../images/mokr_image_provider.dart';
 import 'mock_user.dart';
 
 /// An immutable mock post generated from a seed.
 ///
-/// All fields are deterministic for a given seed — same seed always
-/// produces the same post across hot reloads, restarts, and reinstalls.
+/// All fields are deterministic for a given seed — same seed always produces
+/// the same post across hot reloads, restarts, and app reinstalls.
 ///
-/// Obtain via [Mokr.post], [Mokr.randomPost], [Mokr.feedPage], or
-/// `'seed'.asMockPost` (see [MokrStringExt]).
+/// Obtain via [Mokr.post] or [Mokr.random.post].
 @immutable
 class MockPost {
   const MockPost({
@@ -17,14 +16,14 @@ class MockPost {
     required this.id,
     required this.author,
     required this.caption,
-    required this.imageUrl,
-    required this.imageCategory,
+    required this.hasImage,
+    required this.category,
     required this.likeCount,
     required this.commentCount,
     required this.shareCount,
+    required this.isLiked,
     required this.createdAt,
     required this.tags,
-    required this.isLiked,
   });
 
   /// The seed used to generate this post.
@@ -33,47 +32,51 @@ class MockPost {
   /// Short stable ID derived from [seed]. e.g. `'pst_b2e9'`
   final String id;
 
-  /// The post author. Generated deterministically from `'${seed}_author'`.
+  /// Post author. Generated from `'${seed}_author'`.
   final MockUser author;
 
   /// Post caption (1–4 phrases joined).
   final String caption;
 
-  /// Image URL. Null for text-only posts (~20% probability).
-  final String? imageUrl;
+  /// Whether this post has an associated image. ~80% probability.
+  final bool hasImage;
 
-  /// Image category. Set even for text-only posts — used for URL construction.
-  final MokrCategory? imageCategory;
+  /// Image category. Always set — use [hasImage] to determine visibility.
+  final MokrCategory category;
 
-  /// Like count. Triangle distribution (0–10k, peak ~5k).
+  /// Like count. Triangle distribution, mean 5 000.
   final int likeCount;
 
-  /// Comment count.
+  /// Comment count. Uniform in [0, 500).
   final int commentCount;
 
-  /// Share count.
+  /// Share count. Uniform in [0, 200).
   final int shareCount;
-
-  /// Post creation date. Deterministic — relative to a fixed reference date.
-  final DateTime createdAt;
-
-  /// List of hashtags (0–5). Without the `#` prefix.
-  final List<String> tags;
 
   /// Whether the current user has liked this post. ~30% probability.
   final bool isLiked;
 
-  // ─── Computed ─────────────────────────────────────────────────────────────
+  /// Post creation date. Deterministic — relative to a fixed reference date.
+  final DateTime createdAt;
 
-  /// True when [imageUrl] is non-null.
-  bool get hasImage => imageUrl != null;
+  /// Hashtags (0–5). Without the `#` prefix.
+  final List<String> tags;
 
-  /// Human-readable like count. e.g. `'1.2k'`
+  // ─── Image stubs — wired in Phase 3 ──────────────────────────────────────
+
+  /// Image URL. Returns empty string until Phase 3 wires the image namespace.
+  /// Only meaningful when [hasImage] is true.
+  String get imageUrl => '';
+
+  // imageProvider and imageMeta are added in Phase 3.
+
+  // ─── Computed getters ─────────────────────────────────────────────────────
+
+  /// Human-readable like count. e.g. `'1.2K'`
   String get formattedLikes => _formatCount(likeCount);
 
-  /// Relative time string based on [createdAt] vs [DateTime.now()].
-  ///
-  /// Uses [DateTime.now()] for display only — [createdAt] itself is deterministic.
+  /// Relative time string for display. Uses [DateTime.now] — display only,
+  /// [createdAt] itself is fully deterministic.
   String get relativeTime {
     final diff = DateTime.now().difference(createdAt);
     if (diff.inSeconds < 60) return 'just now';
@@ -86,7 +89,7 @@ class MockPost {
 
   static String _formatCount(int n) {
     if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
-    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}k';
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
     return '$n';
   }
 

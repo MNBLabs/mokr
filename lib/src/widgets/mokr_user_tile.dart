@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../core/mokr_base.dart';
 import '../data/models/mock_user.dart';
-import '../mokr_public.dart';
 import 'mokr_avatar.dart';
 
-/// A list tile showing avatar, name, username, and optional trailing widget.
+/// A list tile showing avatar, name, handle, and an optional trailing widget.
 ///
 /// ```dart
 /// MokrUserTile(seed: 'user_42')
@@ -19,37 +19,23 @@ class MokrUserTile extends StatelessWidget {
     super.key,
     this.seed,
     this.slot,
-    this.pin = false,
     this.trailing,
     this.onTap,
-  })  : assert(
+  }) : assert(
           seed == null || slot == null,
           'Provide either seed or slot, not both.',
-        ),
-        assert(
-          !pin || slot != null,
-          'pin requires a slot name.',
         );
 
-  /// Deterministic seed. Provide [seed] or [slot], not both.
   final String? seed;
-
-  /// Slot name for stable-random mode. Persisted across restarts.
   final String? slot;
-
-  /// When true, this slot survives [Mokr.clearAll]. Requires [slot].
-  final bool pin;
-
-  /// Optional widget shown at the end of the tile (e.g. a Follow button).
   final Widget? trailing;
-
-  /// Called when the tile is tapped.
   final VoidCallback? onTap;
 
   MockUser _resolveUser() {
+    // Phase 2 will wire Mokr.random.user(slot:) here.
     if (seed != null) return Mokr.user(seed!);
-    if (slot != null) return Mokr.randomUser(slot: slot!, pin: pin);
-    return Mokr.randomUser();
+    if (slot != null) return Mokr.user(slot!);
+    return Mokr.user('default');
   }
 
   @override
@@ -67,9 +53,8 @@ class MokrUserTile extends StatelessWidget {
           Flexible(
             child: Text(
               user.name,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -80,7 +65,7 @@ class MokrUserTile extends StatelessWidget {
         ],
       ),
       subtitle: Text(
-        user.username,
+        user.handle,
         style: theme.textTheme.bodySmall?.copyWith(color: mutedColor),
       ),
       trailing: trailing,
