@@ -77,7 +77,7 @@ class PostCard extends StatelessWidget {
           // ── Post image (data API: Image.network from post.imageUrl) ────
           if (post.hasImage)
             Image.network(
-              post.imageUrl!,
+              post.imageUrl,
               width: double.infinity,
               height: 200,
               fit: BoxFit.cover,

@@ -32,10 +32,8 @@ class MokrUserTile extends StatelessWidget {
   final VoidCallback? onTap;
 
   MockUser _resolveUser() {
-    // Phase 2 will wire Mokr.random.user(slot:) here.
     if (seed != null) return Mokr.user(seed!);
-    if (slot != null) return Mokr.user(slot!);
-    return Mokr.user('default');
+    return Mokr.random.user(slot: slot); // slot == null → fresh random
   }
 
   @override

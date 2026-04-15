@@ -11,7 +11,6 @@ enum MokrCategory {
   art,
   technology,
   office,
-  // ignore: constant_identifier_names
   abstract_,
   product,
   interior,

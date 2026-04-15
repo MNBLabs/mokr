@@ -1,4 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart';
+
+import '../../images/image_namespace.dart';
+import '../../images/mokr_image_provider.dart';
+import 'mokr_image_meta.dart';
 
 /// An immutable mock user generated from a seed.
 ///
@@ -79,12 +84,25 @@ class MockUser {
     return 'Joined ${months[joinedAt.month - 1]} ${joinedAt.year}';
   }
 
-  // ─── Image stubs — wired in Phase 3 ──────────────────────────────────────
+  // ─── Image getters ────────────────────────────────────────────────────────
 
-  /// Avatar URL. Returns empty string until Phase 3 wires the image namespace.
-  String get avatarUrl => '';
+  /// Square avatar URL. Delegates to the active [MokrImageProvider].
+  String get avatarUrl =>
+      activeMokrProvider.avatarUrl(seed, MokrCategory.face);
 
-  // avatarProvider and avatarMeta are added in Phase 3.
+  /// [ImageProvider] for use with `Image(image: user.avatarProvider)`.
+  ImageProvider get avatarProvider => NetworkImage(avatarUrl);
+
+  /// Full [MokrImageMeta] for the avatar — provider, URL, and aspect ratio.
+  /// Avatar aspect ratio is always `1.0` (square).
+  MokrImageMeta get avatarMeta => MokrImageMeta(
+        provider: avatarProvider,
+        url: avatarUrl,
+        aspectRatio: 1.0,
+        ratio: MokrRatio.square,
+        seed: seed,
+        category: MokrCategory.face,
+      );
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 

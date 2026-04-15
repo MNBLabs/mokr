@@ -28,10 +28,8 @@ class MokrPostCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   MockPost _resolvePost() {
-    // Phase 2 will wire Mokr.random.post(slot:) here.
     if (seed != null) return Mokr.post(seed!);
-    if (slot != null) return Mokr.post(slot!);
-    return Mokr.post('default');
+    return Mokr.random.post(slot: slot); // slot == null → fresh random
   }
 
   @override

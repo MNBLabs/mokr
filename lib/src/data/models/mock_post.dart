@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart';
 
+import '../../images/image_namespace.dart';
 import '../../images/mokr_image_provider.dart';
 import 'mock_user.dart';
+import 'mokr_image_meta.dart';
 
 /// An immutable mock post generated from a seed.
 ///
@@ -62,13 +65,27 @@ class MockPost {
   /// Hashtags (0–5). Without the `#` prefix.
   final List<String> tags;
 
-  // ─── Image stubs — wired in Phase 3 ──────────────────────────────────────
+  // ─── Image getters — only meaningful when [hasImage] is true ────────────
 
-  /// Image URL. Returns empty string until Phase 3 wires the image namespace.
-  /// Only meaningful when [hasImage] is true.
-  String get imageUrl => '';
+  /// Image URL. Delegates to the active [MokrImageProvider].
+  String get imageUrl => activeMokrProvider.imageUrl(seed, category);
 
-  // imageProvider and imageMeta are added in Phase 3.
+  /// [ImageProvider] for use with `Image(image: post.imageProvider)`.
+  ImageProvider get imageProvider => NetworkImage(imageUrl);
+
+  /// Full [MokrImageMeta] — provider, URL, and aspect ratio together.
+  MokrImageMeta get imageMeta {
+    final u = imageUrl;
+    final ar = activeMokrProvider.knownAspectRatio(seed, category) ?? (16 / 9);
+    return MokrImageMeta(
+      provider: NetworkImage(u),
+      url: u,
+      aspectRatio: ar,
+      ratio: MokrImageMeta.ratioFrom(ar),
+      seed: seed,
+      category: category,
+    );
+  }
 
   // ─── Computed getters ─────────────────────────────────────────────────────
 
