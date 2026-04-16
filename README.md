@@ -2,11 +2,7 @@
 
 Realistic mock data and images for Flutter UI development.
 
----
-
 > **⚠️ Development only.** mokr refuses to run in release builds.
-
----
 
 ## Install
 
@@ -15,8 +11,6 @@ Realistic mock data and images for Flutter UI development.
 dependencies:
   mokr: ^1.0.0
 ```
-
----
 
 ## Quick Start
 
@@ -39,8 +33,6 @@ Mokr.user('u1').name                                              // → 'Jordan
 Mokr.image.meta('p1', category: MokrCategory.food).aspectRatio   // → 1.33
 ```
 
----
-
 ## Feed Example
 
 ```dart
@@ -60,8 +52,6 @@ MokrFeedBuilder(
 
 `MokrFeedBuilder` resolves the post list synchronously and passes it straight
 to your builder. You own the layout entirely.
-
----
 
 ## Your Widget, Mokr's Data
 
@@ -111,8 +101,6 @@ class MyPostCard extends StatelessWidget {
 }
 ```
 
----
-
 ## Three Modes
 
 | Mode | Call | Persists? |
@@ -134,8 +122,6 @@ Mokr.random.post()
 
 Mokr.feed('home_feed', page: 0, pageSize: 20)
 ```
-
----
 
 ## Image Access Levels
 
@@ -168,8 +154,6 @@ Mokr.image.avatarProvider('user_42')   // → ImageProvider
 Mokr.image.avatarMeta('user_42')       // → MokrImageMeta (always 1:1)
 ```
 
----
-
 ## Image Categories
 
 | Category | Use for |
@@ -191,8 +175,6 @@ Mokr.image.avatarMeta('user_42')       // → MokrImageMeta (always 1:1)
 | `MokrCategory.pets` | Pet apps, community feeds |
 
 > `abstract_` has a trailing underscore because `abstract` is a reserved Dart keyword.
-
----
 
 ## Graduation Flow
 
@@ -217,8 +199,6 @@ Mokr.user('mokr_a7Be')   // no disk, no init() dependency, same on every device
 The deterministic form never writes to disk and has no dependency on `Mokr.init()`
 completing — it works the same on every device, forever.
 
----
-
 ## Slot Management
 
 Slots let you freeze a random result across hot reloads and app restarts without
@@ -238,8 +218,6 @@ await Mokr.slots.clearAll();
 final map = Mokr.slots.list();  // → {'profile_card': 'mokr_a7Be', ...}
 ```
 
----
-
 ## Text Namespace
 
 Generate individual strings without a full model:
@@ -254,8 +232,6 @@ Mokr.text.initials('seed')   // → 'JR'
 ```
 
 All strings are deterministic — same seed, same output, always.
-
----
 
 ## Unsplash Images (opt-in)
 
@@ -293,8 +269,6 @@ final status = Mokr.cache.status();
 await Mokr.cache.clear();
 ```
 
----
-
 ## Convenience Widgets
 
 For when you don't need full control over layout:
@@ -328,8 +302,6 @@ MokrUserTile(
 
 All widgets accept a custom `loadingBuilder` and `errorBuilder` so you can plug in
 your own shimmer and fallback states.
-
----
 
 ## License
 
