@@ -1,9 +1,7 @@
-# Contributing to mokr
+# Contributing to Mokr
 
 Thank you for your interest in mokr. This document explains how contributions work,
 what is accepted, and the terms under which contributions are made.
-
----
 
 ## Maintainer
 
@@ -14,8 +12,6 @@ There is no obligation to merge any contribution, regardless of quality.
 
 > The project may be transferred to a new organisation in the future.
 > This document will be updated to reflect any such change.
-
----
 
 ## Design Principles (Read Before Contributing)
 
@@ -39,8 +35,6 @@ What this means in practice:
 - **Debug-only, always.** mokr must never run in release builds. No contribution may
   weaken or remove this guarantee.
 
----
-
 ## What Is Welcome
 
 - Bug fixes with a clear reproduction case
@@ -60,8 +54,6 @@ What this means in practice:
 - Changes that make any currently synchronous public method asynchronous
 - Anything that could cause mokr to run in release builds
 
----
-
 ## How to Contribute
 
 1. **Open an issue first.** Describe what you want to change and why. Wait for a
@@ -80,8 +72,6 @@ What this means in practice:
 
 4. **Open a pull request** against the `main` branch. Reference the issue number.
    Include a clear description of what changed and why.
-
----
 
 ## Contributor License Agreement
 
@@ -108,23 +98,17 @@ to the following terms:
 These terms are consistent with the
 [Developer Certificate of Origin (DCO)](https://developercertificate.org/).
 
----
-
 ## Forking
 
 mokr is MIT licensed. You are free to fork it and use it under the terms of the
 [LICENSE](LICENSE) file. If you publish a fork to pub.dev, choose a different package
 name. Do not publish a fork as `mokr`.
 
----
-
 ## Code of Conduct
 
 Be direct and respectful. Contributions are evaluated on technical merit against the
 design principles above. Discussions should stay focused on the code and the problem,
 not on the people involved.
-
----
 
 ## Questions
 
