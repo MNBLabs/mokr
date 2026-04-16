@@ -1,3 +1,20 @@
+/// Realistic mock data and images for Flutter UI development.
+///
+/// Initialize once before [runApp]:
+/// ```dart
+/// void main() async {
+///   WidgetsFlutterBinding.ensureInitialized();
+///   await Mokr.init();
+///   runApp(const MyApp());
+/// }
+/// ```
+///
+/// Then access mock data anywhere — sync, no awaiting:
+/// ```dart
+/// final user = Mokr.user('profile_hero');
+/// final post = Mokr.post('feed_0');
+/// final img  = Mokr.image.meta('post_1', category: MokrCategory.food);
+/// ```
 library mokr;
 
 export 'src/core/mokr_base.dart';

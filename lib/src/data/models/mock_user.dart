@@ -10,7 +10,7 @@ import 'mokr_image_meta.dart';
 /// All fields are deterministic for a given seed — same seed always produces
 /// the same user across hot reloads, restarts, and app reinstalls.
 ///
-/// Obtain via [Mokr.user] or [Mokr.random.user].
+/// Obtain via [Mokr.user] or [MokrRandom.user].
 @immutable
 class MockUser {
   const MockUser({
@@ -78,8 +78,18 @@ class MockUser {
   /// `'Joined Month Year'` string. e.g. `'Joined March 2024'`
   String get relativeJoinDate {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return 'Joined ${months[joinedAt.month - 1]} ${joinedAt.year}';
   }
@@ -87,8 +97,7 @@ class MockUser {
   // ─── Image getters ────────────────────────────────────────────────────────
 
   /// Square avatar URL. Delegates to the active [MokrImageProvider].
-  String get avatarUrl =>
-      activeMokrProvider.avatarUrl(seed, MokrCategory.face);
+  String get avatarUrl => activeMokrProvider.avatarUrl(seed, MokrCategory.face);
 
   /// [ImageProvider] for use with `Image(image: user.avatarProvider)`.
   ImageProvider get avatarProvider => NetworkImage(avatarUrl);

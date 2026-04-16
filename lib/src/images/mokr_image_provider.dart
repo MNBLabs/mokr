@@ -49,8 +49,9 @@ enum MokrShape { circle, rounded, square }
 /// - Never throw.
 /// - Be synchronous.
 ///
-/// Built-in implementations: [PicsumMokrImageProvider], [UnsplashMokrImageProvider].
-/// Custom providers can be passed to [Mokr.init(imageProvider:)].
+/// Built-in implementations: `PicsumMokrImageProvider` (default, no key needed)
+/// and `UnsplashMokrImageProvider` (opt-in via `Mokr.init(unsplashKey:)`).
+/// Custom providers can be passed to [Mokr.init].
 abstract class MokrImageProvider {
   const MokrImageProvider();
 
@@ -76,8 +77,8 @@ abstract class MokrImageProvider {
   /// Returns the aspect ratio (width / height) for images returned by
   /// [imageUrl] with default dimensions, without making a network request.
   ///
-  /// Return [null] if unknown — Mokr defaults to `16/9`.
+  /// Return `null` if unknown — Mokr defaults to `16/9`.
   /// - Picsum: always known (ratio = width/height baked into URL).
-  /// - Unsplash: known after [Mokr.cache.warm()] completes.
+  /// - Unsplash: known after [MokrCache.warm] completes.
   double? knownAspectRatio(String seed, MokrCategory category);
 }

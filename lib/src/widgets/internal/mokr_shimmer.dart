@@ -96,8 +96,7 @@ class MokrAvatarError extends StatelessWidget {
       child: const ColoredBox(
         color: Color(0xFFE0E0E0),
         child: Center(
-          child: Icon(Icons.person_outline,
-              color: Color(0xFFBBBBBB), size: 20),
+          child: Icon(Icons.person_outline, color: Color(0xFFBBBBBB), size: 20),
         ),
       ),
     );

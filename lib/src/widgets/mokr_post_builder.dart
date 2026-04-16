@@ -49,7 +49,7 @@ class MokrPostBuilder extends StatelessWidget {
   /// Deterministic seed — same post on every call.
   final String? seed;
 
-  /// Slot key — stable random post, re-generates only after [Mokr.slots.clear].
+  /// Slot key — stable random post, re-generates only after [MokrSlots.clear].
   final String? slot;
 
   /// Receives the resolved [MockPost] and returns your widget.

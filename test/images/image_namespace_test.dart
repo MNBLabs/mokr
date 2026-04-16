@@ -25,7 +25,8 @@ void main() {
     });
 
     test('respects custom width and height', () {
-      final url = ns.url('p1', category: MokrCategory.nature, width: 400, height: 300);
+      final url =
+          ns.url('p1', category: MokrCategory.nature, width: 400, height: 300);
       expect(url, contains('400/300'));
     });
 

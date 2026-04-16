@@ -35,8 +35,7 @@ class UnsplashMokrImageProvider extends MokrImageProvider {
           photos.addAll(fetched);
         } catch (e) {
           if (kDebugMode) {
-            debugPrint(
-                '[mokr] ⚠️  unsplash failed: ${category.keyword} — $e');
+            debugPrint('[mokr] ⚠️  unsplash failed: ${category.keyword} — $e');
           }
           break;
         }

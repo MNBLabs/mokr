@@ -47,7 +47,8 @@ void main() {
       expect(find.byType(MokrUserBuilder), findsOneWidget);
     });
 
-    testWidgets('fresh mode (no seed/slot) renders without error', (tester) async {
+    testWidgets('fresh mode (no seed/slot) renders without error',
+        (tester) async {
       await tester.pumpWidget(_wrap(
         MokrUserBuilder(
           builder: (_, user) => Text(user.name),
@@ -173,7 +174,8 @@ void main() {
 
     testWidgets('same feedSeed + page always produces same first caption',
         (tester) async {
-      final expected = Mokr.feed('stable_feed', page: 0, pageSize: 5).first.caption;
+      final expected =
+          Mokr.feed('stable_feed', page: 0, pageSize: 5).first.caption;
       String? received;
       await tester.pumpWidget(_wrap(
         MokrFeedBuilder(
@@ -254,14 +256,14 @@ void main() {
   group('MokrAvatar — Phase 4', () {
     testWidgets('seed mode renders Image with NetworkImage provider',
         (tester) async {
-      await tester.pumpWidget(_wrap(MokrAvatar(seed: 'u1', size: 48)));
+      await tester.pumpWidget(_wrap(const MokrAvatar(seed: 'u1', size: 48)));
       await tester.pump();
       expect(find.byType(MokrAvatar), findsOneWidget);
     });
 
     testWidgets('shows shimmer before image loads (frame == null)',
         (tester) async {
-      await tester.pumpWidget(_wrap(MokrAvatar(seed: 'u1', size: 48)));
+      await tester.pumpWidget(_wrap(const MokrAvatar(seed: 'u1', size: 48)));
       // No pump(Duration) — image won't actually load in tests
       expect(find.byType(MokrShimmer), findsOneWidget);
     });
@@ -284,7 +286,7 @@ void main() {
   group('MokrImage — Phase 4', () {
     testWidgets('aspectRatioFromSource wraps in AspectRatio', (tester) async {
       await tester.pumpWidget(_wrap(
-        MokrImage(
+        const MokrImage(
           seed: 'post_1',
           category: MokrCategory.nature,
           aspectRatioFromSource: true,
@@ -295,7 +297,7 @@ void main() {
 
     testWidgets('fixed height does not wrap in AspectRatio', (tester) async {
       await tester.pumpWidget(_wrap(
-        MokrImage(
+        const MokrImage(
           seed: 'post_1',
           category: MokrCategory.nature,
           height: 200,
@@ -309,7 +311,8 @@ void main() {
         MokrImage(
           seed: 'post_1',
           category: MokrCategory.food,
-          loadingBuilder: (_) => const Text('img_loading', key: Key('img_load')),
+          loadingBuilder: (_) =>
+              const Text('img_loading', key: Key('img_load')),
         ),
       ));
       expect(find.byKey(const Key('img_load')), findsOneWidget);

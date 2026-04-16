@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 /// Snapshot of the Unsplash image cache state for one [MokrCategory].
 ///
-/// Obtained via [Mokr.cache.status()].
+/// Obtained via [MokrCache.status].
 @immutable
 class CacheStatus {
   const CacheStatus({

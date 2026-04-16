@@ -79,7 +79,8 @@ final class MokrImageCache {
       final file = await _cacheFile();
       if (!await file.exists()) return;
 
-      final json = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+      final json =
+          jsonDecode(await file.readAsString()) as Map<String, dynamic>;
       final warmedAtStr = json['warmed_at'] as String?;
       if (warmedAtStr == null) return;
 
@@ -87,7 +88,9 @@ final class MokrImageCache {
 
       final cats = json['categories'] as Map<String, dynamic>? ?? {};
       for (final entry in cats.entries) {
-        final category = MokrCategory.values.where((c) => c.keyword == entry.key).firstOrNull;
+        final category = MokrCategory.values
+            .where((c) => c.keyword == entry.key)
+            .firstOrNull;
         if (category == null) continue;
         final items = (entry.value as List<dynamic>)
             .map((e) => CachedPhoto.fromJson(e as Map<String, dynamic>))

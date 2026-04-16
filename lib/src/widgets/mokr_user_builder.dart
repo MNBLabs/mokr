@@ -48,7 +48,7 @@ class MokrUserBuilder extends StatelessWidget {
   /// Deterministic seed — same user on every call.
   final String? seed;
 
-  /// Slot key — stable random user, re-generates only after [Mokr.slots.clear].
+  /// Slot key — stable random user, re-generates only after [MokrSlots.clear].
   final String? slot;
 
   /// Receives the resolved [MockUser] and returns your widget.

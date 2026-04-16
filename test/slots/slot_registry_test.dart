@@ -28,7 +28,8 @@ void main() {
     });
 
     test('generateSeed produces different values (probabilistic)', () {
-      final seeds = List.generate(20, (_) => SlotRegistry.generateSeed()).toSet();
+      final seeds =
+          List.generate(20, (_) => SlotRegistry.generateSeed()).toSet();
       // Collisions possible but extremely unlikely with 14M+ space
       expect(seeds.length, greaterThan(15));
     });

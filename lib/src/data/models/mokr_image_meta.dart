@@ -17,7 +17,7 @@ import '../../images/mokr_image_provider.dart';
 /// )
 /// ```
 ///
-/// Obtain via [Mokr.image.meta], [Mokr.image.avatarMeta],
+/// Obtain via [MokrImageNamespace.meta], [MokrImageNamespace.avatarMeta],
 /// [MockUser.avatarMeta], or [MockPost.imageMeta].
 @immutable
 class MokrImageMeta {

@@ -43,7 +43,7 @@ class MokrAvatar extends StatelessWidget {
   /// Deterministic seed — same avatar on every call.
   final String? seed;
 
-  /// Slot key — stable random avatar, re-generates only after [Mokr.slots.clear].
+  /// Slot key — stable random avatar, re-generates only after [MokrSlots.clear].
   final String? slot;
 
   /// Width and height of the avatar in logical pixels.
@@ -110,7 +110,8 @@ class MokrAvatar extends StatelessWidget {
     if (border != null) {
       content = DecoratedBox(
         decoration: BoxDecoration(
-          shape: shape == MokrShape.circle ? BoxShape.circle : BoxShape.rectangle,
+          shape:
+              shape == MokrShape.circle ? BoxShape.circle : BoxShape.rectangle,
           borderRadius: shape == MokrShape.rounded
               ? BorderRadius.circular(size / 4)
               : null,

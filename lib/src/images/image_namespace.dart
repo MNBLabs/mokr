@@ -76,7 +76,8 @@ final class MokrImageNamespace {
     int width = 800,
     int height = 600,
   }) {
-    return NetworkImage(url(seed, category: category, width: width, height: height));
+    return NetworkImage(
+        url(seed, category: category, width: width, height: height));
   }
 
   /// Returns a [MokrImageMeta] containing provider, URL, and aspect ratio.

@@ -1,266 +1,176 @@
 # mokr
 
-**Realistic mock data and images for Flutter UI development.**
-
-Drop one line anywhere in your widget tree. Get a realistic user, post, or image — stable across hot reloads, restarts, and team members' machines. No backend. No setup beyond `await Mokr.init()`.
+Realistic mock data and images for Flutter UI development.
 
 ---
 
-> **⚠️ Development and prototyping only.**
-> `mokr` asserts and refuses to run in release builds.
-> **Do not ship** it to end users or include it in production app bundles.
+> **⚠️ Development only.** mokr refuses to run in release builds.
 
 ---
 
-## The Problem
+## Install
 
-Building UI in Flutter means staring at placeholder boxes and `Lorem Ipsum` until your backend is ready. Once you wire up real data, everything shifts — layouts break, names are too long or too short, images never match the category you designed for.
-
-`mokr` gives you realistic, deterministic mock data that behaves exactly like real data, immediately. A user always has the same name. A post always has the same caption. An image always comes from the right category. Your UI looks finished before your backend exists.
+```yaml
+# pubspec.yaml
+dependencies:
+  mokr: ^1.0.0
+```
 
 ---
 
 ## Quick Start
 
-```yaml
-# pubspec.yaml
-dependencies:
-  mokr: ^0.1.0
-```
+`Mokr.init()` must be called once in `main()`, before `runApp()`. It loads slot
+state from disk and optionally warms the image cache. Every other Mokr call is
+synchronous — no `await`, no `FutureBuilder` anywhere in your widgets.
 
 ```dart
 // main.dart
 void main() async {
-  await Mokr.init();
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await Mokr.init();   // call once here — never inside a widget
+  runApp(const MyApp());
 }
 ```
 
 ```dart
-// Anywhere in your widget tree — no await, no FutureBuilder
-MokrAvatar(seed: 'user_42', size: 48)
-MokrImage(seed: 'post_1', category: MokrCategory.nature)
-MokrPostCard(seed: 'feed_0')
-
-// Or use the data directly in your own widgets
-final user = Mokr.user('user_42');
-Text(user.name)
-Text('@${user.username}')
-
-// URL strings for NetworkImage, CachedNetworkImage, etc.
-Image.network(Mokr.avatarUrl('user_42', size: 80))
-Image.network(Mokr.imageUrl('post_1', category: MokrCategory.travel))
+// Anywhere in your widget tree — sync, no await needed
+Mokr.user('u1').name                                              // → 'Jordan Rivera'
+Mokr.image.meta('p1', category: MokrCategory.food).aspectRatio   // → 1.33
 ```
 
 ---
 
-## The Four Modes
-
-mokr has four ways to generate data. They form a spectrum from throwaway to permanent.
+## Feed Example
 
 ```dart
-// 1 — Fresh random
-//     Different every call. Nothing stored. Use for quick browsing.
-Mokr.randomUser()
-
-// 2 — Slot (stable random)
-//     Random once, then frozen. Stable across hot reloads and restarts.
-//     Clear it when you want a new result.
-Mokr.randomUser(slot: 'card_1')
-
-// 3 — Pinned slot
-//     Same as slot, but protected from Mokr.clearAll().
-//     Only clears when you explicitly call Mokr.clearPin('hero').
-Mokr.randomUser(slot: 'hero', pin: true)
-
-// 4 — Deterministic
-//     Seed baked into code. Same result everywhere, forever.
-//     No disk, no init() dependency, no runtime state.
-Mokr.user('user_42')
+MokrFeedBuilder(
+  feedSeed: 'home_feed',
+  pageSize: 20,
+  builder: (context, posts) => ListView.builder(
+    itemCount: posts.length,
+    itemBuilder: (_, i) => ListTile(
+      leading: Image(image: posts[i].author.avatarProvider),
+      title: Text(posts[i].author.name),
+      subtitle: Text(posts[i].caption),
+    ),
+  ),
+)
 ```
 
-The same four modes work for posts and all widgets:
+`MokrFeedBuilder` resolves the post list synchronously and passes it straight
+to your builder. You own the layout entirely.
+
+---
+
+## Your Widget, Mokr's Data
+
+Mokr adapts to whatever your widget already accepts — `ImageProvider` for `Image`,
+`double` for `AspectRatio`, plain `String` for `Text`. You don't need to adopt any
+Mokr widget to use the data.
 
 ```dart
-Mokr.randomPost()
-Mokr.randomPost(slot: 'feed_hero', pin: true)
-Mokr.post('post_seed')
+class MyPostCard extends StatelessWidget {
+  const MyPostCard({super.key, required this.post});
+  final MockPost post;
 
-MokrAvatar()                             // fresh random
-MokrAvatar(slot: 'card_1')               // slot
-MokrAvatar(slot: 'hero', pin: true)      // pinned slot
-MokrAvatar(seed: 'user_42')              // deterministic
+  @override
+  Widget build(BuildContext context) {
+    // imageMeta bundles provider + url + aspectRatio — all synchronous
+    final meta = post.imageMeta;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // avatarProvider is a plain ImageProvider — pass it straight to Image
+        Image(
+          image: post.author.avatarProvider,
+          width: 40,
+          height: 40,
+          fit: BoxFit.cover,
+          frameBuilder: (_, child, frame, __) =>
+              frame == null ? const MyShimmer() : child,  // your own shimmer
+        ),
+
+        // aspectRatio is known before the image loads — no layout jump
+        AspectRatio(
+          aspectRatio: meta.aspectRatio,
+          child: Image(
+            image: meta.provider,
+            fit: BoxFit.cover,
+            frameBuilder: (_, child, frame, __) =>
+                frame == null ? const MyShimmer() : child,
+          ),
+        ),
+
+        // Plain string — no model needed if you only want text
+        Text(Mokr.text.caption('post_seed')),
+      ],
+    );
+  }
+}
 ```
 
 ---
 
-## The Graduation Flow
+## Three Modes
 
-Start with `randomUser()` and browse. When you see a result you like, make it permanent.
+| Mode | Call | Persists? |
+|---|---|---|
+| Deterministic | `Mokr.user('seed')` | No — seed is in your code, nothing written to disk |
+| Stable slot | `Mokr.random.user(slot: 'x')` | Yes — random once, frozen until you clear it |
+| Fresh random | `Mokr.random.user()` | No — new result every call |
 
-```
-Step 1 — write this, iterate fast:
-  Mokr.randomUser()
-
-Step 2 — see a user you like. Console shows:
-  [mokr] 🎲 fresh → seed: 'mokr_a7Be'
-
-Step 3 — copy the seed, freeze it forever:
-  Mokr.user('mokr_a7Be')
-```
-
-Or skip step 3 and use a slot — the result stays stable without baking a seed into code:
+All three modes work for users, posts, and feeds:
 
 ```dart
-Mokr.randomUser(slot: 'profile_card')  // frozen until you clear it
+Mokr.user('profile_hero')               // deterministic
+Mokr.random.user(slot: 'sidebar_card')  // stable slot
+Mokr.random.user()                      // fresh random
+
+Mokr.post('featured')
+Mokr.random.post(slot: 'feed_hero')
+Mokr.random.post()
+
+Mokr.feed('home_feed', page: 0, pageSize: 20)
 ```
 
 ---
 
-## Widgets
+## Image Access Levels
 
-All mokr widgets are standard Flutter widgets. They work anywhere — inside `Card`, `ListView.builder`, `Stack`, `Expanded`, or as `child:` of any widget.
+Choose the level that matches what your widget accepts:
 
-### MokrAvatar
+| Level | Returns | Use when |
+|---|---|---|
+| URL | `String` | You're using `Image.network` or `CachedNetworkImage` |
+| Provider | `ImageProvider` | You're using `Image(image: ...)` |
+| Meta | `MokrImageMeta` | You need `aspectRatio` too (prevents layout jump) |
 
 ```dart
-// Circle (default), rounded, or square
-MokrAvatar(seed: 'user_42', size: 48)
-MokrAvatar(seed: 'user_42', size: 48, shape: MokrShape.rounded)
-MokrAvatar(seed: 'user_42', size: 48, shape: MokrShape.square)
+// URL
+final url = Mokr.image.url('p1', category: MokrCategory.travel);
 
-// With border
-MokrAvatar(seed: 'user_42', size: 48, border: Border.all(width: 2))
+// ImageProvider
+final provider = Mokr.image.provider('p1', category: MokrCategory.food);
+Image(image: provider, fit: BoxFit.cover)
 
-// Custom loading / error states
-MokrAvatar(
-  seed: 'user_42',
-  size: 48,
-  loadingBuilder: (context) => MyShimmer(),
-  errorBuilder: (context) => MyFallback(),
+// MokrImageMeta — provider + url + aspectRatio in one object
+final meta = Mokr.image.meta('p1', category: MokrCategory.nature);
+AspectRatio(
+  aspectRatio: meta.aspectRatio,   // known before image loads
+  child: Image(image: meta.provider, fit: BoxFit.cover),
 )
 
-// Slot and fresh random work too
-MokrAvatar(slot: 'sidebar_user', size: 40)
-MokrAvatar(size: 40)  // fresh random
-```
-
-### MokrImage
-
-```dart
-// Fixed size
-MokrImage(
-  seed: 'post_1',
-  category: MokrCategory.nature,
-  width: 400,
-  height: 300,
-)
-
-// Fill parent (inside Expanded, AspectRatio, SizedBox.expand, etc.)
-MokrImage(
-  seed: 'banner',
-  category: MokrCategory.architecture,
-  width: double.infinity,
-  height: 200,
-)
-
-// With border radius
-MokrImage(
-  seed: 'card_image',
-  category: MokrCategory.food,
-  width: 300,
-  height: 200,
-  borderRadius: BorderRadius.circular(12),
-)
-```
-
-### MokrPostCard
-
-```dart
-// Full post card — avatar, image, caption, like/comment/share counts
-MokrPostCard(seed: 'feed_0')
-MokrPostCard(slot: 'featured')
-MokrPostCard(slot: 'featured', pin: true)
-MokrPostCard()  // fresh random
-```
-
-### MokrUserTile
-
-```dart
-// User list tile — avatar, name, username, optional trailing widget
-MokrUserTile(seed: 'user_42')
-MokrUserTile(
-  seed: 'user_42',
-  trailing: FilledButton(onPressed: () {}, child: const Text('Follow')),
-)
-MokrUserTile(slot: 'suggestion_1')
-```
-
----
-
-## Data API
-
-Use the data API when you want to feed mock data into your own widgets.
-
-### Users
-
-```dart
-final user = Mokr.user('user_42');
-
-user.name           // 'Jordan Rivera'
-user.username       // 'jordanrivera'
-user.bio            // 'Outdoor photographer and trail runner.'
-user.seed           // 'user_42'
-user.followerCount  // 4_821
-user.followingCount // 312
-user.postCount      // 87
-user.initials       // 'JR'
-```
-
-### Posts
-
-```dart
-final post = Mokr.post('post_1');
-
-post.caption        // 'Golden hour at the summit. Worth every step. 🌄'
-post.likeCount      // 1_203
-post.commentCount   // 48
-post.shareCount     // 19
-post.formattedLikes // '1.2K'
-post.hasImage       // true
-post.imageUrl       // category-aware URL string
-post.author         // MockUser
-post.createdAt      // DateTime (recent, realistic)
-post.relativeTime   // '3h ago'
-```
-
-### Feeds
-
-```dart
-// Same seed + same page → same posts, always
-final page0 = Mokr.feedPage('home_feed', page: 0, pageSize: 20);
-final page1 = Mokr.feedPage('home_feed', page: 1, pageSize: 20);
-
-// Infinite scroll example:
-ListView.builder(
-  itemCount: posts.length,
-  itemBuilder: (context, i) => PostCard(post: posts[i]),
-)
-```
-
-### String extensions
-
-```dart
-'user_42'.asMockUser   // same as Mokr.user('user_42')
-'post_0'.asMockPost    // same as Mokr.post('post_0')
-'user_42'.asAvatarUrl  // same as Mokr.avatarUrl('user_42')
+// Avatars follow the same three levels
+Mokr.image.avatar('user_42')           // → URL string
+Mokr.image.avatarProvider('user_42')   // → ImageProvider
+Mokr.image.avatarMeta('user_42')       // → MokrImageMeta (always 1:1)
 ```
 
 ---
 
 ## Image Categories
-
-15 categories for every part of your UI:
 
 | Category | Use for |
 |---|---|
@@ -275,94 +185,149 @@ ListView.builder(
 | `MokrCategory.office` | B2B dashboards, productivity apps |
 | `MokrCategory.abstract_` | Backgrounds, decorative images |
 | `MokrCategory.product` | E-commerce, lifestyle photography |
-| `MokrCategory.interior` | Real estate, home decor |
+| `MokrCategory.interior` | Real estate, home décor |
 | `MokrCategory.architecture` | Property apps, city guides |
 | `MokrCategory.automotive` | Car listings, transport apps |
 | `MokrCategory.pets` | Pet apps, community feeds |
 
-Note: `abstract_` has a trailing underscore because `abstract` is a Dart keyword.
+> `abstract_` has a trailing underscore because `abstract` is a reserved Dart keyword.
+
+---
+
+## Graduation Flow
+
+Use `Mokr.random.user()` while iterating. When you find a result you want to keep,
+copy the seed from the console and bake it into your code permanently.
+
+**Step 1** — write this and run the app:
+```dart
+Mokr.random.user()
+```
+
+**Step 2** — mokr prints the seed to the debug console:
+```
+[mokr] 🎲  mokr_a7Be — copy to: Mokr.user('mokr_a7Be')
+```
+
+**Step 3** — paste the seed. That user is now frozen forever:
+```dart
+Mokr.user('mokr_a7Be')   // no disk, no init() dependency, same on every device
+```
+
+The deterministic form never writes to disk and has no dependency on `Mokr.init()`
+completing — it works the same on every device, forever.
 
 ---
 
 ## Slot Management
 
-```dart
-// Clear a single unpinned slot — re-randomises on next call
-await Mokr.clearSlot('card_1');
-
-// Clear a pinned slot — requires explicit intent
-await Mokr.clearPin('hero');
-
-// Clear all unpinned slots — pinned slots survive
-await Mokr.clearAll();
-```
-
-A common pattern for pull-to-refresh:
+Slots let you freeze a random result across hot reloads and app restarts without
+baking a seed into your code.
 
 ```dart
-Future<void> onRefresh() async {
-  await Mokr.clearAll();  // wipe unpinned slots — fresh randoms next build
-  setState(() => _session++);  // new seed → feedPage returns new posts
-}
+// Freeze a random user to a named slot — same result until you clear it
+Mokr.random.user(slot: 'profile_card')
+
+// Clear a single slot — next call picks a new random
+await Mokr.slots.clear('profile_card');
+
+// Clear all slots at once
+await Mokr.slots.clearAll();
+
+// Inspect what slots are currently stored
+final map = Mokr.slots.list();  // → {'profile_card': 'mokr_a7Be', ...}
 ```
+
+---
+
+## Text Namespace
+
+Generate individual strings without a full model:
+
+```dart
+Mokr.text.name('seed')       // → 'Jordan Rivera'
+Mokr.text.handle('seed')     // → '@jordanrivera'
+Mokr.text.bio('seed')        // → 'Trail runner and outdoor photographer.'
+Mokr.text.caption('seed')    // → 'Golden hour at the summit. Worth every step.'
+Mokr.text.comment('seed')    // → 'This is exactly what I needed today.'
+Mokr.text.initials('seed')   // → 'JR'
+```
+
+All strings are deterministic — same seed, same output, always.
 
 ---
 
 ## Unsplash Images (opt-in)
 
-By default, mokr uses [Picsum](https://picsum.photos) — no API key required.
-
-To get real, category-filtered images from [Unsplash](https://unsplash.com/developers):
+By default mokr uses [Picsum Photos](https://picsum.photos) — no API key required.
+To get real, category-filtered images from [Unsplash](https://unsplash.com/developers),
+pass your access key to `Mokr.init()`:
 
 ```dart
-// At startup:
-await Mokr.init(unsplashKey: 'your_access_key');
-
-// Or switch at runtime (e.g. from a dev settings screen):
-final count = await Mokr.useUnsplash('your_access_key');
-// count == 0  → key invalid or network unavailable
-// count 1–15  → categories loaded successfully (rest fall back to Picsum)
-
-// Switch back to Picsum:
-Mokr.usePicsum();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Mokr.init(unsplashKey: 'your_access_key');
+  runApp(const MyApp());
+}
 ```
+
+At startup mokr fetches up to 60 photo URLs per category (30 total API requests) and
+caches them to disk with a 24-hour TTL. After that, all image URL calls are instant and
+synchronous. Categories that fail to load fall back to Picsum transparently.
 
 Use the **Access Key** from your Unsplash app dashboard — not the Secret Key or Application ID.
 
-mokr pre-warms a URL cache at startup (2 requests × 15 categories = 30 total).
-After warm-up, all `imageUrl`, `avatarUrl`, and `bannerUrl` calls are instant and synchronous.
-Categories that fail to warm fall back to Picsum transparently.
+You can also warm the cache on demand (e.g. from a dev settings screen):
+
+```dart
+// Warm or re-warm at runtime — returns the number of categories loaded (0–15)
+final count = await Mokr.cache.warm();
+// count == 0  → key not set or network unavailable
+// count 1–15  → categories loaded (rest fall back to Picsum)
+
+// Inspect cache state per category
+final status = Mokr.cache.status();
+// → {MokrCategory.food: CacheStatus(urlCount: 60, isStale: false), ...}
+
+// Wipe the disk cache
+await Mokr.cache.clear();
+```
 
 ---
 
-## Custom Image Provider
+## Convenience Widgets
 
-Plug in any image source by implementing `MokrImageProvider`:
+For when you don't need full control over layout:
 
 ```dart
-class MyImageProvider extends MokrImageProvider {
-  @override
-  String avatarUrl(String seed, MokrCategory category, {int size = 80}) {
-    return 'https://my-cdn.com/avatars/$seed?size=$size';
-  }
+// Circle avatar (also: MokrShape.rounded, MokrShape.square)
+MokrAvatar(seed: 'user_42', size: 48)
+MokrAvatar(slot: 'sidebar_user', size: 40)
 
-  @override
-  String imageUrl(String seed, MokrCategory category,
-      {int width = 400, int height = 300}) {
-    return 'https://my-cdn.com/images/${category.keyword}/$seed'
-        '?w=$width&h=$height';
-  }
+// Category-aware image with shimmer loading
+MokrImage(seed: 'post_1', category: MokrCategory.nature, height: 200)
 
-  @override
-  String bannerUrl(String seed, MokrCategory category,
-      {int width = 800, int height = 300}) {
-    return 'https://my-cdn.com/banners/$seed?w=$width&h=$height';
-  }
-}
+// Wrap in AspectRatio sized to the actual source image
+MokrImage(
+  seed: 'post_1',
+  category: MokrCategory.food,
+  aspectRatioFromSource: true,
+)
 
-// Activate:
-await Mokr.init(imageProvider: MyImageProvider());
+// Full post card — avatar + image + caption + engagement counts
+MokrPostCard(seed: 'feed_0')
+MokrPostCard(slot: 'featured')
+
+// User list tile with optional trailing widget
+MokrUserTile(seed: 'user_42')
+MokrUserTile(
+  seed: 'user_42',
+  trailing: FilledButton(onPressed: () {}, child: const Text('Follow')),
+)
 ```
+
+All widgets accept a custom `loadingBuilder` and `errorBuilder` so you can plug in
+your own shimmer and fallback states.
 
 ---
 
@@ -370,6 +335,6 @@ await Mokr.init(imageProvider: MyImageProvider());
 
 MIT — see [LICENSE](LICENSE).
 
-Images are sourced from [Picsum Photos](https://picsum.photos) (default) and
-[Unsplash](https://unsplash.com) (opt-in). Refer to their respective terms when using
-Unsplash images. mokr is a development tool — do not use it to serve images to end users.
+Images sourced from [Picsum Photos](https://picsum.photos) (default, no key required)
+and [Unsplash](https://unsplash.com) (opt-in).
+mokr is a development tool — do not use it to serve images to end users.

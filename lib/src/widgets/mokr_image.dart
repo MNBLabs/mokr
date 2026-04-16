@@ -47,7 +47,7 @@ class MokrImage extends StatelessWidget {
   /// Deterministic seed — same image on every call.
   final String? seed;
 
-  /// Slot key — stable random image, re-generates only after [Mokr.slots.clear].
+  /// Slot key — stable random image, re-generates only after [MokrSlots.clear].
   final String? slot;
 
   /// Image category — controls which type of photo is returned.
@@ -92,7 +92,8 @@ class MokrImage extends StatelessWidget {
       );
 
   Widget _error(BuildContext context) =>
-      errorBuilder?.call(context) ?? MokrImageError(width: width, height: height);
+      errorBuilder?.call(context) ??
+      MokrImageError(width: width, height: height);
 
   @override
   Widget build(BuildContext context) {

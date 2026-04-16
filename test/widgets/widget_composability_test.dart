@@ -15,7 +15,7 @@ void main() {
   group('MokrAvatar', () {
     testWidgets('renders in Container', (tester) async {
       await tester.pumpWidget(_wrap(
-        Container(child: MokrAvatar(seed: 'u1', size: 48)),
+        const MokrAvatar(seed: 'u1', size: 48),
       ));
       await tester.pump();
       expect(find.byType(MokrAvatar), findsOneWidget);
@@ -34,7 +34,7 @@ void main() {
 
     testWidgets('renders in Stack', (tester) async {
       await tester.pumpWidget(_wrap(
-        Stack(children: [MokrAvatar(seed: 'u1', size: 48)]),
+        const Stack(children: [MokrAvatar(seed: 'u1', size: 48)]),
       ));
       await tester.pump();
       expect(find.byType(MokrAvatar), findsOneWidget);
@@ -42,7 +42,8 @@ void main() {
 
     testWidgets('renders in Row with Expanded', (tester) async {
       await tester.pumpWidget(_wrap(
-        Row(children: [Expanded(child: MokrAvatar(seed: 'u1', size: 48))]),
+        const Row(
+            children: [Expanded(child: MokrAvatar(seed: 'u1', size: 48))]),
       ));
       await tester.pump();
       expect(find.byType(MokrAvatar), findsOneWidget);
@@ -50,7 +51,7 @@ void main() {
 
     testWidgets('slot mode renders without error', (tester) async {
       await tester.pumpWidget(_wrap(
-        MokrAvatar(slot: 'test_slot', size: 48),
+        const MokrAvatar(slot: 'test_slot', size: 48),
       ));
       await tester.pump();
       expect(find.byType(MokrAvatar), findsOneWidget);
@@ -58,7 +59,7 @@ void main() {
 
     testWidgets('circle shape clips with ClipOval', (tester) async {
       await tester.pumpWidget(_wrap(
-        MokrAvatar(seed: 'u1', size: 48, shape: MokrShape.circle),
+        const MokrAvatar(seed: 'u1', size: 48, shape: MokrShape.circle),
       ));
       await tester.pump();
       expect(find.byType(ClipOval), findsOneWidget);
@@ -66,7 +67,7 @@ void main() {
 
     testWidgets('rounded shape uses ClipRRect', (tester) async {
       await tester.pumpWidget(_wrap(
-        MokrAvatar(seed: 'u1', size: 48, shape: MokrShape.rounded),
+        const MokrAvatar(seed: 'u1', size: 48, shape: MokrShape.rounded),
       ));
       await tester.pump();
       expect(find.byType(ClipRRect), findsOneWidget);
@@ -74,7 +75,7 @@ void main() {
 
     testWidgets('square shape renders without clip', (tester) async {
       await tester.pumpWidget(_wrap(
-        MokrAvatar(seed: 'u1', size: 48, shape: MokrShape.square),
+        const MokrAvatar(seed: 'u1', size: 48, shape: MokrShape.square),
       ));
       await tester.pump();
       expect(find.byType(MokrAvatar), findsOneWidget);
@@ -96,12 +97,10 @@ void main() {
   group('MokrImage', () {
     testWidgets('renders in Container', (tester) async {
       await tester.pumpWidget(_wrap(
-        Container(
-          child: MokrImage(
-            seed: 'post_1',
-            category: MokrCategory.nature,
-            height: 200,
-          ),
+        const MokrImage(
+          seed: 'post_1',
+          category: MokrCategory.nature,
+          height: 200,
         ),
       ));
       await tester.pump();
@@ -125,7 +124,7 @@ void main() {
 
     testWidgets('renders in Stack', (tester) async {
       await tester.pumpWidget(_wrap(
-        Stack(
+        const Stack(
           children: [
             MokrImage(seed: 'post_1', category: MokrCategory.food, height: 200),
           ],
@@ -137,7 +136,7 @@ void main() {
 
     testWidgets('renders in Expanded', (tester) async {
       await tester.pumpWidget(_wrap(
-        Row(
+        const Row(
           children: [
             Expanded(
               child: MokrImage(
@@ -155,7 +154,8 @@ void main() {
 
     testWidgets('slot mode renders without error', (tester) async {
       await tester.pumpWidget(_wrap(
-        MokrImage(slot: 'img_slot', category: MokrCategory.art, height: 150),
+        const MokrImage(
+            slot: 'img_slot', category: MokrCategory.art, height: 150),
       ));
       await tester.pump();
       expect(find.byType(MokrImage), findsOneWidget);
@@ -191,7 +191,7 @@ void main() {
   group('MokrPostCard', () {
     testWidgets('renders in Container', (tester) async {
       await tester.pumpWidget(_wrap(
-        Container(child: MokrPostCard(seed: 'post_0')),
+        const MokrPostCard(seed: 'post_0'),
       ));
       await tester.pump();
       expect(find.byType(MokrPostCard), findsOneWidget);
@@ -210,7 +210,7 @@ void main() {
 
     testWidgets('renders in Stack', (tester) async {
       await tester.pumpWidget(_wrap(
-        Stack(children: [
+        const Stack(children: [
           SizedBox(
             width: 400,
             child: MokrPostCard(seed: 'post_stack'),
@@ -223,7 +223,7 @@ void main() {
 
     testWidgets('renders in Expanded', (tester) async {
       await tester.pumpWidget(_wrap(
-        Row(
+        const Row(
           children: [Expanded(child: MokrPostCard(seed: 'post_expanded'))],
         ),
       ));
@@ -233,14 +233,14 @@ void main() {
 
     testWidgets('slot mode renders without error', (tester) async {
       await tester.pumpWidget(_wrap(
-        MokrPostCard(slot: 'card_slot'),
+        const MokrPostCard(slot: 'card_slot'),
       ));
       await tester.pump();
       expect(find.byType(MokrPostCard), findsOneWidget);
     });
 
     testWidgets('contains MokrAvatar for author', (tester) async {
-      await tester.pumpWidget(_wrap(MokrPostCard(seed: 'post_0')));
+      await tester.pumpWidget(_wrap(const MokrPostCard(seed: 'post_0')));
       await tester.pump();
       expect(find.byType(MokrAvatar), findsOneWidget);
     });
@@ -261,7 +261,7 @@ void main() {
   group('MokrUserTile', () {
     testWidgets('renders in Container', (tester) async {
       await tester.pumpWidget(_wrap(
-        Container(child: MokrUserTile(seed: 'u1')),
+        const MokrUserTile(seed: 'u1'),
       ));
       await tester.pump();
       expect(find.byType(MokrUserTile), findsOneWidget);
@@ -280,7 +280,7 @@ void main() {
 
     testWidgets('slot mode renders without error', (tester) async {
       await tester.pumpWidget(_wrap(
-        MokrUserTile(slot: 'user_slot'),
+        const MokrUserTile(slot: 'user_slot'),
       ));
       await tester.pump();
       expect(find.byType(MokrUserTile), findsOneWidget);
@@ -288,9 +288,9 @@ void main() {
 
     testWidgets('trailing widget is rendered', (tester) async {
       await tester.pumpWidget(_wrap(
-        MokrUserTile(
+        const MokrUserTile(
           seed: 'u1',
-          trailing: const Text('Follow', key: Key('follow')),
+          trailing: Text('Follow', key: Key('follow')),
         ),
       ));
       await tester.pump();
@@ -298,7 +298,7 @@ void main() {
     });
 
     testWidgets('contains MokrAvatar as leading', (tester) async {
-      await tester.pumpWidget(_wrap(MokrUserTile(seed: 'u1')));
+      await tester.pumpWidget(_wrap(const MokrUserTile(seed: 'u1')));
       await tester.pump();
       expect(find.byType(MokrAvatar), findsOneWidget);
     });

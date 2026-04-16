@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../data/generators/feed_generator.dart';
@@ -102,20 +104,25 @@ final class Mokr {
       // Custom provider — use it directly, skip Unsplash.
       setActiveMokrProvider(imageProvider);
     } else if (unsplashKey != null) {
-      // Unsplash path: load disk cache, re-warm if stale.
+      // Unsplash path: load disk cache, install provider, then return.
       await MokrImageCache.instance.load();
-      final unsplash = const UnsplashMokrImageProvider();
+      const unsplash = UnsplashMokrImageProvider();
+      setActiveMokrProvider(unsplash);
       if (MokrImageCache.instance.isStale) {
         if (kDebugMode) {
           debugPrint('[mokr] 🕐  image cache stale — re-warming in background');
         }
-        final count = await unsplash.prewarm(unsplashKey);
-        if (kDebugMode) {
-          debugPrint('[mokr] ✅  unsplash warmed — $count/15 categories');
-        }
-        MokrImageCache.instance.save(); // fire-and-forget
+        // Fire-and-forget: init() returns immediately.
+        // UnsplashMokrImageProvider falls back to Picsum per-category until warm.
+        unawaited(
+          unsplash.prewarm(unsplashKey).then((count) {
+            MokrImageCache.instance.save();
+            if (kDebugMode) {
+              debugPrint('[mokr] ✅  unsplash warmed — $count/15 categories');
+            }
+          }),
+        );
       }
-      setActiveMokrProvider(unsplash);
     }
     // else: default PicsumMokrImageProvider is already active.
 

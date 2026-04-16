@@ -11,7 +11,7 @@ import 'mokr_image_meta.dart';
 /// All fields are deterministic for a given seed — same seed always produces
 /// the same post across hot reloads, restarts, and app reinstalls.
 ///
-/// Obtain via [Mokr.post] or [Mokr.random.post].
+/// Obtain via [Mokr.post] or [MokrRandom.post].
 @immutable
 class MockPost {
   const MockPost({
