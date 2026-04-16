@@ -1,4 +1,4 @@
-# mokr
+# Mokr
 
 Realistic mock data and images for Flutter UI development.
 
